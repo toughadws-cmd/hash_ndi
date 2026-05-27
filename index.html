@@ -1,0 +1,2976 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HASH + NDI - Aplicar para a Comunidade</title>
+  
+  <!-- Font: JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            hacker: {
+              black: '#03050a',
+              dark: '#070b13',
+              green: '#2bd87a',
+              greenDim: '#1b8a4e',
+              red: '#ff5f56',
+              yellow: '#ffbd2e',
+              blue: '#57a5e5',
+              gray: '#6272a4',
+              text: '#e2e8f0',
+              input: '#0c101a',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Custom Styling for Hacker Terminal */
+    body {
+      background-color: #03050a;
+      overflow: hidden;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Scanlines effect */
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 0, 0, 0.25) 50%
+      );
+      background-size: 100% 4px;
+      z-index: 50;
+      opacity: 0.4;
+    }
+
+    /* Grid overlay */
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: 
+        linear-gradient(to right, rgba(43, 216, 122, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(43, 216, 122, 0.02) 1px, transparent 1px);
+      background-size: 20px 20px;
+      z-index: 45;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #070b13;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2bd87a;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #1b8a4e;
+    }
+
+    /* Hide scrollbar utility */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+
+    /* Terminal Gutter styling */
+    .gutter-line {
+      line-height: 1.5rem;
+      height: 1.5rem;
+      text-align: right;
+      padding-right: 0.75rem;
+      user-select: none;
+      color: #6272a4;
+      opacity: 0.5;
+    }
+
+    /* Cursor animation */
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 16px;
+      background-color: #2bd87a;
+      margin-left: 4px;
+      animation: blink 0.8s infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* ASCII Glitch Effect */
+    .glitch-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .glitch-text {
+      color: #2bd87a;
+      font-weight: bold;
+      line-height: 1.1;
+      white-space: pre;
+    }
+
+    .glitch-text::before,
+    .glitch-text::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #03050a;
+    }
+
+    .glitch-text::before {
+      left: 2px;
+      text-shadow: -1px 0 #ff5f56;
+      clip: rect(44px, 450px, 56px, 0);
+      animation: glitch-anim 5s infinite linear alternate-reverse;
+    }
+
+    .glitch-text::after {
+      left: -2px;
+      text-shadow: -1px 0 #57a5e5, 0 1px #ffbd2e;
+      clip: rect(85px, 450px, 140px, 0);
+      animation: glitch-anim2 5s infinite linear alternate-reverse;
+    }
+
+    @keyframes glitch-anim {
+      0% { clip: rect(15px, 9999px, 66px, 0); }
+      10% { clip: rect(34px, 9999px, 55px, 0); }
+      20% { clip: rect(89px, 9999px, 99px, 0); }
+      30% { clip: rect(11px, 9999px, 33px, 0); }
+      40% { clip: rect(78px, 9999px, 120px, 0); }
+      50% { clip: rect(5px, 9999px, 50px, 0); }
+      60% { clip: rect(105px, 9999px, 110px, 0); }
+      70% { clip: rect(62px, 9999px, 92px, 0); }
+      80% { clip: rect(22px, 9999px, 44px, 0); }
+      90% { clip: rect(135px, 9999px, 145px, 0); }
+      100% { clip: rect(50px, 9999px, 80px, 0); }
+    }
+
+    @keyframes glitch-anim2 {
+      0% { clip: rect(65px, 9999px, 115px, 0); }
+      10% { clip: rect(5px, 9999px, 45px, 0); }
+      20% { clip: rect(120px, 9999px, 140px, 0); }
+      30% { clip: rect(40px, 9999px, 80px, 0); }
+      40% { clip: rect(95px, 9999px, 105px, 0); }
+      50% { clip: rect(10px, 9999px, 35px, 0); }
+      60% { clip: rect(130px, 9999px, 150px, 0); }
+      70% { clip: rect(50px, 9999px, 90px, 0); }
+      80% { clip: rect(15px, 9999px, 55px, 0); }
+      90% { clip: rect(85px, 9999px, 125px, 0); }
+      100% { clip: rect(30px, 9999px, 75px, 0); }
+    }
+
+    /* Estilo Glitch do Preloader */
+    .preloader-glitch {
+      position: relative;
+      color: #2bd87a;
+    }
+    .preloader-glitch::before,
+    .preloader-glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #03050a;
+    }
+    .preloader-glitch::before {
+      left: 3px;
+      text-shadow: -2px 0 #ff5f56;
+      clip: rect(24px, 750px, 90px, 0);
+      animation: preloader-glitch-anim1 2s infinite linear alternate-reverse;
+    }
+    .preloader-glitch::after {
+      left: -3px;
+      text-shadow: -2px 0 #57a5e5, 0 2px #ffbd2e;
+      clip: rect(85px, 750px, 140px, 0);
+      animation: preloader-glitch-anim2 2s infinite linear alternate-reverse;
+    }
+
+    @keyframes preloader-glitch-anim1 {
+      0% { clip: rect(40px, 9999px, 60px, 0); }
+      20% { clip: rect(12px, 9999px, 85px, 0); }
+      40% { clip: rect(75px, 9999px, 115px, 0); }
+      60% { clip: rect(5px, 9999px, 45px, 0); }
+      80% { clip: rect(95px, 9999px, 135px, 0); }
+      100% { clip: rect(25px, 9999px, 70px, 0); }
+    }
+
+    @keyframes preloader-glitch-anim2 {
+      0% { clip: rect(65px, 9999px, 105px, 0); }
+      20% { clip: rect(5px, 9999px, 35px, 0); }
+      40% { clip: rect(120px, 9999px, 145px, 0); }
+      60% { clip: rect(45px, 9999px, 90px, 0); }
+      80% { clip: rect(15px, 9999px, 65px, 0); }
+      100% { clip: rect(80px, 9999px, 120px, 0); }
+    }
+
+    @keyframes crt-power-on {
+      0% {
+        transform: scale(0.01, 0.005);
+        opacity: 0;
+        filter: brightness(3);
+      }
+      40% {
+        transform: scale(1, 0.005);
+        opacity: 0.8;
+        filter: brightness(2);
+      }
+      100% {
+        transform: scale(1, 1);
+        opacity: 1;
+        filter: brightness(1);
+      }
+    }
+
+    .crt-animate-open {
+      animation: crt-power-on 0.6s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+      transform-origin: center;
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fade-in 0.2s ease-out forwards;
+    }
+    @keyframes spinner-rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .animate-spinner {
+      animation: spinner-rotate 1s linear infinite;
+    }
+  </style>
+</head>
+<body class="relative w-screen h-screen text-hacker-text bg-hacker-black overflow-hidden font-mono select-none flex flex-col justify-between">
+
+  <!-- Preloader Hacker Overlay -->
+  <div id="preloader-overlay" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#03050a] transition-opacity duration-500 ease-out select-none">
+    <!-- Overlay Screen Effects específicos para o preloader -->
+    <div class="scanlines"></div>
+    <div class="grid-overlay"></div>
+    
+    <div class="w-full max-w-4xl px-6 flex flex-col items-center justify-center">
+      <!-- Preloader command line -->
+      <div id="preloader-cmd-container" class="font-mono text-xl sm:text-2xl text-[#2bd87a] self-start mb-8 pl-4">
+        <span class="text-[#57a5e5] font-bold">~/hash_ndi$ </span>
+        <span id="preloader-cmd-text"></span><span id="preloader-cmd-cursor" class="cursor"></span>
+      </div>
+      
+      <!-- Preloader main logo (starts hidden) -->
+      <div id="preloader-main-container" class="flex flex-col items-center justify-center text-center px-4 max-w-full hidden">
+        <div id="preloader-title" class="font-mono font-extrabold text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-widest text-[#2bd87a] relative cursor-default" data-text="HASHMAN + NDI">
+          <span id="preloader-title-text"></span><span id="preloader-title-cursor" class="cursor"></span>
+        </div>
+        
+        <div class="font-mono text-lg sm:text-2xl text-[#6272a4] tracking-wider mt-6 h-8 min-h-[2rem]">
+          <span id="preloader-subtitle-text"></span><span id="preloader-subtitle-cursor" class="cursor hidden"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Matrix Rain Canvas Background -->
+  <canvas id="matrix-canvas" class="fixed inset-0 w-full h-full object-cover -z-10 opacity-15 pointer-events-none"></canvas>
+  
+  <!-- Overlay Screen Effects -->
+  <div class="scanlines"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Desktop Icons -->
+  <div class="absolute top-6 left-6 flex flex-col gap-6 z-20">
+    <!-- Icon: Terminal (apply_hash.sh) -->
+    <div id="icon-terminal" class="flex flex-col items-center justify-center w-20 group cursor-pointer">
+      <div class="w-12 h-12 flex items-center justify-center rounded-lg border border-hacker-green/20 bg-hacker-dark/60 group-hover:bg-hacker-green/10 group-hover:border-hacker-green/60 shadow-[0_0_5px_rgba(43,216,122,0.1)] group-hover:shadow-[0_0_12px_rgba(43,216,122,0.4)] transition-all duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-hacker-green">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
+        </svg>
+      </div>
+      <span class="text-[10px] text-center mt-1 text-hacker-text truncate w-full px-1 group-hover:text-hacker-green transition-colors">apply_hash.sh</span>
+    </div>
+
+    <!-- Icon: README.md -->
+    <div id="icon-readme" class="flex flex-col items-center justify-center w-20 group cursor-pointer">
+      <div class="w-12 h-12 flex items-center justify-center rounded-lg border border-hacker-blue/20 bg-hacker-dark/60 group-hover:bg-hacker-blue/10 group-hover:border-hacker-blue/60 shadow-[0_0_5px_rgba(87,165,229,0.1)] group-hover:shadow-[0_0_12px_rgba(87,165,229,0.4)] transition-all duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-hacker-blue">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+        </svg>
+      </div>
+      <span class="text-[10px] text-center mt-1 text-hacker-text truncate w-full px-1 group-hover:text-hacker-blue transition-colors">README.md</span>
+    </div>
+
+    <!-- Icon: Lixeira -->
+    <div id="icon-lixeira" class="flex flex-col items-center justify-center w-20 group cursor-pointer">
+      <div class="w-12 h-12 flex items-center justify-center rounded-lg border border-hacker-red/20 bg-hacker-dark/60 group-hover:bg-hacker-red/10 group-hover:border-hacker-red/60 shadow-[0_0_5px_rgba(255,95,86,0.1)] group-hover:shadow-[0_0_12px_rgba(255,95,86,0.4)] transition-all duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-hacker-red">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+        </svg>
+      </div>
+      <span class="text-[10px] text-center mt-1 text-hacker-text truncate w-full px-1 group-hover:text-hacker-red transition-colors">lixeira.bin</span>
+    </div>
+  </div>
+
+  <!-- Workspace Area -->
+  <div class="flex-1 w-full h-[calc(100vh-48px)] flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
+    
+    <!-- Outer Drag Wrapper -->
+    <div id="window-drag-wrapper" class="w-full max-w-4xl z-10 flex flex-col transition-all duration-75">
+      
+      <!-- Terminal Window Container (Inner Container) -->
+      <div id="terminal-window" class="w-full bg-hacker-dark/85 backdrop-blur-md border border-hacker-green/35 overflow-hidden flex flex-col flex-1 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+        
+        <!-- Terminal Header (IDE-like Window Bar) -->
+        <div id="terminal-header" class="flex items-center justify-between bg-hacker-input/90 backdrop-blur-md px-4 py-3 border-b border-hacker-gray/20 select-none cursor-grab active:cursor-grabbing">
+          <div class="flex items-center gap-2">
+            <div id="btn-close" class="w-3 h-3 rounded-full bg-hacker-red cursor-pointer hover:brightness-125 hover:shadow-[0_0_6px_rgba(255,95,86,0.8)] transition-all" title="Fechar"></div>
+            <div id="btn-minimize" class="w-3 h-3 rounded-full bg-hacker-yellow cursor-pointer hover:brightness-125 hover:shadow-[0_0_6px_rgba(255,189,46,0.8)] transition-all" title="Minimizar"></div>
+            <div id="btn-maximize" class="w-3 h-3 rounded-full bg-hacker-blue cursor-pointer hover:brightness-125 hover:shadow-[0_0_6px_rgba(87,165,229,0.8)] transition-all" title="Maximizar"></div>
+          </div>
+          <div class="text-xs font-semibold text-hacker-gray font-mono flex items-center gap-2">
+            <span>sys_apply: hash_ndi_terminal.sh</span>
+            <span class="px-1.5 py-0.5 rounded bg-hacker-gray/10 text-[10px] text-hacker-green">v1.0.2-prod</span>
+          </div>
+          <div class="w-10"></div> <!-- Spacer -->
+        </div>
+
+        <!-- Terminal Main Body -->
+        <div class="flex flex-1 min-h-[550px] max-h-[800px] overflow-y-auto text-sm leading-6 no-scrollbar" id="terminal-scroll-container">
+          
+          <!-- Gutter (Line Numbers) -->
+          <div class="bg-hacker-input/50 py-4 px-3 border-r border-hacker-gray/10 flex flex-col select-none text-right font-mono" id="terminal-gutter">
+            <!-- Lines will be dynamically generated here -->
+          </div>
+          
+          <!-- Content Area -->
+          <div class="flex-1 p-6 font-mono flex flex-col space-y-4" id="terminal-body">
+            
+            <!-- ================= BOOT SEQUENCE ================= -->
+            <div id="boot-section" class="space-y-4">
+              <!-- Command typing -->
+              <div>
+                <span class="text-hacker-blue font-bold">~/network_dos_irmaos$</span>
+                <span id="boot-command" class="text-hacker-text"></span><span id="boot-cursor-cmd" class="cursor"></span>
+              </div>
+
+              <!-- Banner Glitch (Loaded dynamically after command types) -->
+              <div id="boot-banner-container" class="hidden my-4 overflow-x-auto">
+                <div class="glitch-container">
+                  <pre class="glitch-text text-[10px] sm:text-xs leading-none" id="glitch-art" data-text=""></pre>
+                </div>
+              </div>
+
+              <!-- Manifesto and Tree (Fade in after banner) -->
+              <div id="boot-manifesto-container" class="hidden space-y-4">
+                <div class="text-hacker-gray border-l-2 border-hacker-green/40 pl-4 py-1 italic" id="manifesto-text">
+                  <!-- Typed Manifesto will appear here -->
+                </div>
+                
+                <div class="mt-4 text-hacker-text hidden" id="tree-container">
+                  <span class="text-hacker-blue">├── HASH_NDI/features</span><br>
+                  <span class="text-hacker-gray">│   ├── </span><span class="text-hacker-green font-bold">Engenharia Reversa</span> (Desconstrução de SaaS validados)<br>
+                  <span class="text-hacker-gray">│   ├── </span><span class="text-hacker-green font-bold">Matchmaking</span> (Conectando devs & experts em marketing)<br>
+                  <span class="text-hacker-gray">│   ├── </span><span class="text-hacker-green font-bold">Inteligência Artificial</span> (Automações, APIs, integrações)<br>
+                  <span class="text-hacker-gray">│   └── </span><span class="text-hacker-green font-bold">Repositório de Code</span> (Templates Next.js, boilerplates e infra)<br>
+                  <span class="text-hacker-blue">└── HASH_NDI/apply_sequence.sh</span>
+                </div>
+
+                <!-- Start Application Button -->
+                <div class="pt-6 hidden" id="start-btn-container">
+                  <button 
+                    id="btn-start"
+                    class="px-6 py-3 border-2 border-hacker-green text-hacker-green font-bold text-sm tracking-wider uppercase bg-transparent hover:bg-hacker-green hover:text-hacker-black shadow-[0_0_15px_rgba(43,216,122,0.2)] hover:shadow-[0_0_25px_rgba(43,216,122,0.5)] transition-all duration-300 focus:outline-none"
+                  >
+                    [ INICIAR APLICAÇÃO ]
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ================= FORM CHAT LOG AREA ================= -->
+            <div id="chat-section" class="hidden flex flex-col space-y-4">
+              <!-- Command typed when form starts -->
+              <div id="chat-cmd-line">
+                <span class="text-hacker-blue font-bold">~/network_dos_irmaos$ </span>
+                <span id="chat-cmd-text" class="text-hacker-text"></span><span id="chat-cmd-cursor" class="cursor"></span>
+              </div>
+              <div id="chat-msg1-line" class="hidden">
+                <span id="chat-msg1-text" class="text-hacker-gray"></span><span id="chat-msg1-cursor" class="cursor"></span>
+              </div>
+              <div id="chat-msg2-line" class="hidden">
+                <span id="chat-msg2-text" class="text-hacker-gray"></span>
+              </div>
+
+              <!-- Question History Logs -->
+              <div id="chat-history" class="space-y-4">
+                <!-- Dynamic logs will be appended here -->
+              </div>
+
+              <!-- Active Question Container -->
+              <div id="active-question-container" class="space-y-3 pt-2">
+                <!-- Active Question Text -->
+                <div class="flex items-start gap-2">
+                  <span class="text-hacker-green font-bold">SYSTEM:</span>
+                  <div id="active-question-text" class="text-hacker-text"></div>
+                </div>
+
+                <!-- Input Fields Container -->
+                <div id="active-input-container" class="pl-6 space-y-3">
+                  <!-- Will contain dynamically injected inputs (text, radio, checkbox, etc.) -->
+                </div>
+
+                <!-- Error message area -->
+                <div id="error-message" class="pl-6 text-hacker-red font-bold hidden">
+                  [ERRO] Campo obrigatório. Por favor preencha antes de avançar.
+                </div>
+              </div>
+            </div>
+
+            <!-- ================= COMPILATION / FINAL SCREEN ================= -->
+            <div id="final-section" class="hidden space-y-4 pt-4 border-t border-hacker-gray/20">
+              <div id="final-msg1-line" class="hidden text-hacker-yellow font-bold">
+                <span id="final-msg1-text"></span><span id="final-msg1-cursor" class="cursor"></span>
+              </div>
+              <div id="final-msg2-line" class="hidden text-hacker-green font-bold">
+                <span id="final-msg2-text"></span><span id="final-msg2-cursor" class="cursor"></span>
+              </div>
+
+              <!-- Summary Box -->
+              <div id="final-report-container" class="hidden bg-hacker-input border border-hacker-gray/20 p-4 rounded text-xs leading-relaxed max-h-[300px] overflow-y-auto">
+                <pre id="summary-box" class="text-hacker-text whitespace-pre-wrap select-all font-mono"></pre>
+              </div>
+
+              <!-- Action Buttons -->
+              <div id="final-actions-container" class="hidden flex flex-col space-y-4">
+                <div class="flex flex-wrap gap-4 pt-4">
+                  <button id="btn-whatsapp" class="px-5 py-2.5 border border-hacker-green bg-transparent text-hacker-green hover:bg-hacker-green hover:text-hacker-black font-bold uppercase text-xs tracking-wider transition-all duration-300">Enviar por WhatsApp</button>
+                  <button id="btn-email" class="px-5 py-2.5 border border-hacker-blue bg-transparent text-hacker-blue hover:bg-hacker-blue hover:text-hacker-black font-bold uppercase text-xs tracking-wider transition-all duration-300">Enviar por E-mail</button>
+                  <button id="btn-copy" class="px-5 py-2.5 border border-hacker-yellow bg-transparent text-hacker-yellow hover:bg-hacker-yellow hover:text-hacker-black font-bold uppercase text-xs tracking-wider transition-all duration-300">Copiar Relatório</button>
+                </div>
+                <div class="text-[10px] text-hacker-gray">* Seus dados não são armazenados em servidores externos públicos. O envio é feito diretamente pelo seu dispositivo.</div>
+
+                <!-- Lead Score Pitch Dashboard -->
+                <div id="pitch-dashboard" class="mt-6 border border-hacker-green/40 bg-[#070b13]/90 rounded-xl p-6 space-y-5 shadow-[0_0_20px_rgba(43,216,122,0.15)]">
+                  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-hacker-gray/20 pb-4 gap-3">
+                    <div>
+                      <div class="text-[10px] text-hacker-gray font-mono tracking-widest uppercase">Diagnóstico do Algoritmo</div>
+                      <h3 id="pitch-profile-title" class="text-base font-bold font-mono tracking-wide text-hacker-green"></h3>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span id="pitch-badge" class="px-2 py-0.5 rounded text-[9px] font-bold border border-hacker-gray/30 bg-hacker-gray/10 text-hacker-gray font-mono"></span>
+                      <span id="pitch-score-badge" class="px-2 py-0.5 rounded text-[9px] font-bold border border-hacker-green/30 bg-hacker-green/10 text-hacker-green font-mono"></span>
+                    </div>
+                  </div>
+                  <div class="space-y-3 font-mono">
+                    <div>
+                      <span class="text-hacker-green font-bold text-xs">Foco recomendado:</span>
+                      <div id="pitch-focus" class="text-hacker-text font-bold text-xs mt-1"></div>
+                    </div>
+                    <p id="pitch-text" class="text-xs text-hacker-text leading-relaxed whitespace-pre-wrap bg-[#0c101a]/50 p-4 border border-hacker-gray/10 rounded font-mono"></p>
+                  </div>
+                  <div class="border-t border-hacker-gray/20 pt-4 space-y-3 font-mono text-center">
+                    <div class="font-bold text-hacker-yellow text-xs uppercase tracking-wider">🚀 Acesso Combinado Liberado (Sem Limitações)</div>
+                    <p class="text-xs text-hacker-text leading-relaxed max-w-xl mx-auto">Ao ingressar agora, você adquire acesso imediato ao ecossistema completo <strong>HASH_NDI</strong> (boilerplates, tutoriais de SaaS e IA) e à <strong>Comunidade Network dos Irmãos (NDI)</strong> por um valor simbólico exclusivo.</p>
+                    <div class="flex flex-col items-center justify-center py-4 bg-hacker-green/5 border border-hacker-green/20 rounded-xl max-w-xs mx-auto">
+                      <div class="text-[9px] text-hacker-gray uppercase tracking-widest font-bold">Comunidade NDI + HASH_NDI</div>
+                      <div class="flex items-baseline gap-2 mt-1">
+                        <span class="text-hacker-gray text-xs line-through">R$ 197,00</span>
+                        <span class="text-hacker-green text-2xl font-extrabold tracking-tight">R$ 29,90</span>
+                      </div>
+                      <div class="text-[9px] text-hacker-green font-bold mt-1 uppercase tracking-widest animate-pulse">★ Acesso Imediato Vitalício ★</div>
+                    </div>
+                  </div>
+                  <div class="flex flex-col items-center justify-center pt-2">
+                    <button id="btn-checkout-cta" class="w-full max-w-xs py-3 bg-hacker-green hover:brightness-110 text-hacker-black font-bold uppercase text-xs tracking-wider rounded-lg transition-all duration-300 shadow-[0_0_15px_rgba(43,216,122,0.3)] hover:shadow-[0_0_20px_rgba(43,216,122,0.5)] cursor-pointer text-center flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0">🔓 GARANTIR COMBO POR R$ 29,90</button>
+                    <div class="text-[9px] text-hacker-gray mt-2 font-mono">🔒 Conexão segura SSL 256-bit</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Terminal Footer (IDE-like status bar) -->
+        <div class="bg-hacker-input/80 px-4 py-2 border-t border-hacker-gray/20 flex items-center justify-between text-[11px] text-hacker-gray font-mono">
+          <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-hacker-green animate-ping"></span>
+              STATUS: ONLINE
+            </span>
+            <span class="hidden sm:inline">|</span>
+            <span class="hidden sm:inline">BRANCH: main</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span>ENCODING: UTF-8</span>
+            <span>|</span>
+            <span id="line-col-counter">LN 1, COL 1</span>
+            <span>|</span>
+            <span>SHADCN-TERMINAL</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VSL Outer Drag Wrapper -->
+    <div id="vsl-window-drag-wrapper" class="absolute z-20 flex flex-col w-full max-w-xl transition-all duration-75 hidden" style="left: 50%; top: 50%; transform: translate(-50%, -50%);">
+      
+      <!-- VSL Window Container (Inner Container) -->
+      <div id="vsl-window" class="w-full bg-[#070b13]/90 backdrop-blur-md border border-[#ff5f56]/30 overflow-hidden flex flex-col flex-1 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+        
+        <!-- VSL Header (IDE-like Window Bar) -->
+        <div id="vsl-header" class="flex items-center justify-between bg-[#0c101a]/95 backdrop-blur-md px-4 py-2.5 border-b border-hacker-gray/20 select-none cursor-grab active:cursor-grabbing">
+          <div class="flex items-center gap-2">
+            <div id="btn-vsl-close" class="w-3 h-3 rounded-full bg-[#ff5f56] cursor-pointer hover:brightness-125 hover:shadow-[0_0_6px_rgba(255,95,86,0.8)] transition-all" title="Fechar"></div>
+            <div id="btn-vsl-minimize" class="w-3 h-3 rounded-full bg-[#ffbd2e] cursor-pointer hover:brightness-125 hover:shadow-[0_0_6px_rgba(255,189,46,0.8)] transition-all" title="Minimizar"></div>
+            <div id="btn-vsl-maximize" class="w-3 h-3 rounded-full bg-[#57a5e5] cursor-pointer hover:brightness-125 hover:shadow-[0_0_6px_rgba(87,165,229,0.8)] transition-all" title="Maximizar"></div>
+          </div>
+          <div class="text-[11px] text-[#6272a4] font-semibold tracking-wider flex items-center gap-1.5 font-mono">
+            <span>📹</span>
+            <span>vsl_presentation.mp4</span>
+          </div>
+          <div class="w-16"></div> <!-- Spacer to center the title -->
+        </div>
+
+        <!-- VSL Content Area -->
+        <div class="relative w-full bg-black overflow-hidden flex flex-col items-center flex-1">
+          <!-- Blind shield overlay to block direct player clicks -->
+          <div id="vsl-blind-shield" class="absolute inset-0 z-20 cursor-not-allowed bg-transparent" style="height: calc(100% - 48px)"></div>
+          
+          <!-- YouTube Player Iframe -->
+          <div id="vsl-youtube-player" class="w-full aspect-video z-10"></div>
+          
+          <!-- VSL Loading Overlay -->
+          <div id="vsl-loading-overlay" class="absolute inset-0 bg-[#070b13]/95 backdrop-blur-sm z-30 flex flex-col items-center justify-center p-4">
+            <div class="flex flex-col items-center gap-4 text-center">
+              <div class="relative w-16 h-16">
+                <div class="absolute inset-0 rounded-full border-4 border-[#2bd87a]/20"></div>
+                <div class="absolute inset-0 rounded-full border-4 border-t-[#2bd87a] border-r-[#2bd87a] animate-spinner"></div>
+              </div>
+              <div class="text-xs text-[#2bd87a] font-bold tracking-widest uppercase animate-pulse">
+                Estabelecendo canal seguro...
+              </div>
+              <div class="text-[10px] text-[#6272a4] font-mono">
+                BANDA LARGA DIRETA // PROTOCOLO VSL
+              </div>
+            </div>
+          </div>
+          
+          <!-- Audio and Proceed Controls bar -->
+          <div id="vsl-controls-bar" class="w-full bg-[#0c101a] p-3 border-t border-[#6272a4]/20 flex items-center justify-between z-30">
+            <button 
+              id="btn-vsl-audio-ctrl" 
+              class="px-4 py-1.5 bg-[#ff5f56] text-white font-bold text-xs uppercase hover:bg-[#d63f37] transition-all rounded shadow-[0_0_8px_rgba(255,95,86,0.2)]"
+            >
+              DESMUTAR VÍDEO
+            </button>
+            <button 
+              id="btn-vsl-proceed-ctrl" 
+              class="px-4 py-1.5 bg-[#2bd87a] text-[#03050a] font-bold text-xs uppercase hover:bg-[#1b8a4e] hover:text-white transition-all rounded shadow-[0_0_8px_rgba(43,216,122,0.2)]"
+            >
+              AVANÇAR PARA APLICAÇÃO
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Checkout Gateway Window -->
+    <div id="checkout-window-drag-wrapper" class="absolute z-30 flex flex-col w-full max-w-md transition-all duration-75 hidden" style="left: 50%; top: 50%; transform: translate(calc(-50% + 120px), calc(-50% + 80px));">
+      <div id="checkout-window" class="w-full bg-[#070b13]/95 backdrop-blur-xl border border-hacker-green/40 overflow-hidden flex flex-col flex-1 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7),0_0_30px_rgba(43,216,122,0.1)]">
+        <!-- Checkout Header -->
+        <div id="checkout-header" class="flex items-center justify-between bg-[#0c101a]/95 backdrop-blur-md px-4 py-2.5 border-b border-hacker-green/20 select-none cursor-grab active:cursor-grabbing">
+          <div class="flex items-center gap-2">
+            <div id="btn-checkout-close" class="w-3 h-3 rounded-full bg-[#ff5f56] cursor-pointer hover:brightness-125 hover:shadow-[0_0_6px_rgba(255,95,86,0.8)] transition-all" title="Fechar"></div>
+            <div id="btn-checkout-minimize" class="w-3 h-3 rounded-full bg-[#ffbd2e] cursor-pointer hover:brightness-125 hover:shadow-[0_0_6px_rgba(255,189,46,0.8)] transition-all" title="Minimizar"></div>
+            <div id="btn-checkout-maximize" class="w-3 h-3 rounded-full bg-[#57a5e5] cursor-pointer hover:brightness-125 hover:shadow-[0_0_6px_rgba(87,165,229,0.8)] transition-all" title="Maximizar"></div>
+          </div>
+          <div class="text-[11px] text-hacker-green font-semibold tracking-wider flex items-center gap-1.5 font-mono">
+            <span>🔒</span>
+            <span>secure_gateway.sh</span>
+            <span class="px-1.5 py-0.5 rounded bg-hacker-green/10 text-[9px] text-hacker-green border border-hacker-green/20">SSL</span>
+          </div>
+          <div class="w-10"></div>
+        </div>
+        <!-- Checkout Body -->
+        <div id="checkout-body" class="flex-1 overflow-y-auto p-5 space-y-5 font-mono text-xs no-scrollbar">
+          <!-- Content injected by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Taskbar bottom OS style -->
+  <div class="w-full h-12 bg-hacker-input/95 backdrop-blur-md border-t border-hacker-gray/20 flex items-center justify-between px-4 z-40 select-none">
+    <!-- Left: Widget do Sistema -->
+    <div class="flex-1 flex justify-start items-center gap-2 text-xs text-hacker-gray font-semibold">
+      <span class="text-hacker-green">🌐</span>
+      <span class="hidden md:inline">HASHMAN OS v1.0.3</span>
+    </div>
+
+    <!-- Center: Menu HASH e Abas de Janelas Ativas (Agrupados e Centralizados) -->
+    <div class="flex-initial flex items-center justify-center gap-2 bg-hacker-input/60 border border-white/5 rounded-full px-4 py-1 backdrop-blur-sm shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+      <div class="relative">
+        <button 
+          id="btn-start-menu"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-hacker-green/10 hover:bg-hacker-green/20 border border-hacker-green/30 hover:border-hacker-green/60 text-hacker-green font-bold text-xs tracking-wider uppercase transition-all duration-200 cursor-pointer shadow-[0_0_5px_rgba(43,216,122,0.1)] hover:shadow-[0_0_8px_rgba(43,216,122,0.3)]"
+        >
+          <span class="w-2.5 h-2.5 rounded-full bg-hacker-green animate-pulse"></span>
+          HASH
+        </button>
+
+        <!-- Start Menu Popup estilo Windows 11 -->
+        <div id="start-menu-popup" class="fixed bottom-16 left-1/2 -translate-x-1/2 w-[480px] max-w-[90vw] bg-hacker-dark/90 backdrop-blur-md border border-hacker-green/30 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.6)] overflow-hidden z-50 hidden font-mono text-xs flex flex-col">
+          <!-- Campo de Busca -->
+          <div class="p-4 border-b border-hacker-gray/10">
+            <div class="relative">
+              <input 
+                type="text" 
+                placeholder="Pesquisar aplicativos, arquivos..." 
+                class="w-full bg-hacker-input border border-hacker-gray/20 rounded-lg px-8 py-2 text-hacker-text focus:outline-none focus:border-hacker-green/60 text-xs pl-9" 
+                readonly 
+              />
+              <span class="absolute left-3 top-2.5 text-hacker-gray">🔍</span>
+            </div>
+          </div>
+
+          <!-- Seção Fixados (Pinned Apps Grid) -->
+          <div class="p-5">
+            <div class="text-[10px] text-hacker-gray font-semibold mb-3 uppercase tracking-wider">Fixados</div>
+            <div class="grid grid-cols-3 gap-4">
+              <!-- Terminal -->
+              <div 
+                id="start-menu-terminal"
+                class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-all duration-150 border border-transparent hover:border-white/5"
+              >
+                <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-hacker-green/10 border border-hacker-green/20 text-hacker-green text-lg">
+                  &gt;_
+                </div>
+                <span class="text-[10px] text-center text-hacker-text font-medium">Terminal</span>
+              </div>
+
+              <!-- README -->
+              <div 
+                id="start-menu-readme"
+                class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-all duration-150 border border-transparent hover:border-white/5"
+              >
+                <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-hacker-blue/10 border border-hacker-blue/20 text-hacker-blue text-lg">
+                  🖿
+                </div>
+                <span class="text-[10px] text-center text-hacker-text font-medium">README.md</span>
+              </div>
+
+              <!-- NDI Network -->
+              <div 
+                id="start-menu-ndi"
+                class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-all duration-150 border border-transparent hover:border-white/5"
+              >
+                <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-hacker-yellow/10 border border-hacker-yellow/20 text-hacker-yellow text-lg">
+                  🛜
+                </div>
+                <span class="text-[10px] text-center text-hacker-text font-medium">NDI Network</span>
+              </div>
+
+              <!-- SaaS Engine -->
+              <div 
+                id="start-menu-saas"
+                class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-all duration-150 border border-transparent hover:border-white/5"
+              >
+                <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 text-lg">
+                  ⚙️
+                </div>
+                <span class="text-[10px] text-center text-hacker-text font-medium">SaaS Engine</span>
+              </div>
+
+              <!-- IA Agent -->
+              <div 
+                id="start-menu-ia"
+                class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-all duration-150 border border-transparent hover:border-white/5"
+              >
+                <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-hacker-red/10 border border-hacker-red/20 text-hacker-red text-lg">
+                  🤖
+                </div>
+                <span class="text-[10px] text-center text-hacker-text font-medium">Agente IA</span>
+              </div>
+
+              <!-- Ajustes -->
+              <div 
+                id="start-menu-ajustes"
+                class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-all duration-150 border border-transparent hover:border-white/5"
+              >
+                <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white text-lg">
+                  🛠️
+                </div>
+                <span class="text-[10px] text-center text-hacker-text font-medium">Ajustes</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção Recomendados -->
+          <div class="p-5 border-t border-hacker-gray/10 bg-hacker-input/30 flex-1">
+            <div class="text-[10px] text-hacker-gray font-semibold mb-3 uppercase tracking-wider">Recomendados</div>
+            <div class="grid grid-cols-2 gap-4">
+              <div 
+                id="start-menu-rec-terminal"
+                class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all border border-transparent hover:border-white/5"
+              >
+                <span class="text-hacker-green text-base">&gt;_</span>
+                <div class="flex flex-col">
+                  <span class="text-[11px] text-hacker-text font-medium">apply_hash.sh</span>
+                  <span class="text-[9px] text-hacker-gray">Recente</span>
+                </div>
+              </div>
+
+              <div 
+                id="start-menu-rec-readme"
+                class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all border border-transparent hover:border-white/5"
+              >
+                <span class="text-hacker-blue text-base">🖿</span>
+                <div class="flex flex-col">
+                  <span class="text-[11px] text-hacker-text font-medium">README.md</span>
+                  <span class="text-[9px] text-hacker-gray">Recente</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rodapé do Menu -->
+          <div class="bg-hacker-input px-5 py-3.5 border-t border-hacker-gray/20 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-7 h-7 rounded-full bg-hacker-green/20 border border-hacker-green/50 flex items-center justify-center text-[11px] font-bold text-hacker-green">
+                H
+              </div>
+              <div class="flex flex-col">
+                <span class="text-[11px] font-bold text-hacker-text">hacker@ndi</span>
+                <span class="text-[9px] text-hacker-gray">Admin</span>
+              </div>
+            </div>
+            <button 
+              id="start-menu-power"
+              class="w-7 h-7 rounded hover:bg-white/10 flex items-center justify-center text-white transition-all cursor-pointer" 
+              title="Reiniciar Sistema"
+            >
+              ⏻
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button 
+        id="taskbar-terminal-tab"
+        class="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs border transition-all duration-200 cursor-pointer bg-hacker-green/15 text-hacker-green border-hacker-green/40 shadow-[0_0_5px_rgba(43,216,122,0.15)]"
+      >
+        <span>&gt;_</span>
+        <span>hash_ndi_terminal.sh</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-hacker-green" id="taskbar-terminal-status-dot"></span>
+      </button>
+
+      <button 
+        id="taskbar-vsl-tab"
+        class="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs border transition-all duration-200 cursor-pointer hidden bg-hacker-red/15 text-hacker-red border-hacker-red/40 shadow-[0_0_5px_rgba(255,95,86,0.15)]"
+      >
+        <span>📹</span>
+        <span>vsl_presentation.mp4</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-[#ff5f56]" id="taskbar-vsl-status-dot"></span>
+      </button>
+
+      <button 
+        id="taskbar-checkout-tab"
+        class="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs border transition-all duration-200 cursor-pointer hidden bg-hacker-green/15 text-hacker-green border-hacker-green/40 shadow-[0_0_5px_rgba(43,216,122,0.15)]"
+      >
+        <span>🔒</span>
+        <span>secure_gateway.sh</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-hacker-green" id="taskbar-checkout-status-dot"></span>
+      </button>
+    </div>
+
+    <!-- Right: Status Tray e Relógio -->
+    <div class="flex-1 flex justify-end items-center gap-4 text-xs text-hacker-gray font-semibold pl-2">
+      <div class="flex items-center gap-2 text-[10px] hidden sm:flex">
+        <span title="Wi-Fi conectado">📶</span>
+        <span title="Bateria carregada (100%)">🔋</span>
+        <span title="Volume (100%)">🔊</span>
+        <span class="border-l border-hacker-gray/20 h-3 mx-1"></span>
+        <span title="Layout de teclado">POR</span>
+      </div>
+      <div id="system-clock" class="tracking-widest">
+        00:00:00
+      </div>
+    </div>
+  </div>
+
+  <!-- YouTube IFrame API Script -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <!-- Javascript Setup -->
+  <script>
+    // Configurações do Mentor
+    const MENTOR_WHATSAPP = "5511999999999"; 
+    const MENTOR_EMAIL = "mentor@hashndi.com"; 
+
+    // Banner ASCII com Elementos de Marketing, Código e Dinheiro
+    const ASCII_ART = `  __________________________________________________________________________
+ /                                                                          \\
+|  <CODE>                                                        [$$$ MRR]   |
+|   ██╗  ██╗ █████╗ ███████╗██╗  ██╗  |  ███╗   ██╗██████╗ ██╗    /\\  /\\     |
+|   ██║  ██║██╔══██╗██╔════╝██║  ██║  |  ████╗  ██║██╔══██╗██║   /  \\/  \\    |
+|   ███████║███████║███████╗███████║  +  ██╔██╗ ██║██║  ██║██║  /   $$   \\   |
+|   ██╔══██║██╔══██║╚════██║██╔══██║  |  ██║╚██╗██║██║  ██║██║ /   $$$$   \\  |
+|   ██║  ██║██║  ██║███████║██║  ██║  |  ██║ ╚████║██████╔╝██║/   $$$$$$   \\ |
+|   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝  |  ╚═╝  ╚═══╝╚═════╝ ╚═╝\\____________/ |
+|  </CODE>                                                       [SaaS & IA] |
+ \\__________________________________________________________________________/`;
+
+    const MANIFESTO_TEXT = `[MANIFESTO DETECTADO]
+SaaS e Inteligência Artificial não são apenas tecnologias, são alavancas de liberdade.
+Nossos membros constroem ativos digitais reais, criam fluxos de receita recorrente mensal (MRR)
+e integram agentes autônomos para escalar operações globais. 
+Esta comunidade é o catalisador para desenvolvedores que buscam se tornar founders e 
+profissionais de marketing digital que dominam o code de conversão.
+Protocolo de nivelamento carregado.`;
+
+    // Questões do Formulário e Estruturas de Dados
+    const questions = [
+      {
+        id: 1,
+        type: 'radio',
+        question: 'Você já conhece a comunidade Network dos Irmãos (NDI)?',
+        options: ['Sim', 'Não'],
+        required: true,
+        answer: null
+      },
+      {
+        id: 2,
+        type: 'radio',
+        question: 'Você já é Membro Oficial do NDI?',
+        options: ['Sim', 'Não'],
+        required: true,
+        answer: null,
+        condition: (answers) => answers[1] === 'Sim' // Apenas se conhece NDI
+      },
+      {
+        id: 3,
+        type: 'vsl',
+        question: 'Descriptografando mensagem inicial do Protocolo VSL...',
+        required: true,
+        answer: 'Assistido',
+        condition: (answers) => answers[1] === 'Não' // Apenas se NÃO conhece NDI
+      },
+      {
+        id: 4,
+        type: 'text',
+        question: 'Para iniciar, como você se chama?',
+        required: true,
+        answer: null
+      },
+      {
+        id: 5,
+        type: 'text',
+        question: 'Qual o seu @instagram?',
+        required: true,
+        answer: null
+      },
+      {
+        id: 6,
+        type: 'radio',
+        question: 'Qual seu nível de experiência técnica hoje?',
+        options: ['Zero', 'Iniciante', 'Intermediário', 'Avançado'],
+        required: true,
+        answer: null
+      },
+      {
+        id: 7,
+        type: 'checkbox',
+        question: 'Quais áreas você utiliza no seu dia a dia?',
+        options: ['No-Code', 'Automações/Low-Code', 'Front-end', 'Back-end/DB', 'APIs de IA', 'Nenhuma'],
+        required: true,
+        answer: []
+      },
+      {
+        id: 8,
+        type: 'textarea',
+        question: 'Quais ferramentas e linguagens exatas você mais domina?',
+        required: true,
+        answer: null
+      },
+      {
+        id: 9,
+        type: 'radio',
+        question: 'Você já possui um SaaS ativo?',
+        options: ['Já fatura', 'Construindo MVP', 'Só tenho ideia', 'Quero descobrir'],
+        required: true,
+        answer: null
+      },
+      {
+        id: 10,
+        type: 'textarea',
+        question: 'Se você já tem ou pensou em um SaaS, descreva-o brevemente (Opcional):',
+        required: false,
+        answer: ''
+      },
+      {
+        id: 11,
+        type: 'textarea',
+        question: 'O que você mais busca na HASH_NDI?',
+        required: true,
+        answer: null
+      },
+      {
+        id: 12,
+        type: 'text',
+        question: 'Quanto tempo semanal você tem disponível para investir na construção do seu SaaS?',
+        required: true,
+        answer: null
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    const userAnswers = {}; // Map of questionId -> answer value
+    let ytPlayer = null;
+    let isYtApiReady = false;
+
+    // --- Hacker OS Window Manager States & Elements ---
+    let windowOpen = false;
+    let windowMinimized = false;
+    let windowMaximized = false;
+    let position = { x: 0, y: 0 };
+    let isDragging = false;
+    const dragRef = { startX: 0, startY: 0, posX: 0, posY: 0 };
+
+    // Elementos do DOM
+    const canvas = document.getElementById('matrix-canvas');
+    const ctx = canvas.getContext('2d');
+    const terminalBody = document.getElementById('terminal-body');
+    const scrollContainer = document.getElementById('terminal-scroll-container');
+    const terminalGutter = document.getElementById('terminal-gutter');
+
+    const dragWrapper = document.getElementById('window-drag-wrapper');
+    const terminalWindow = document.getElementById('terminal-window');
+    const terminalHeader = document.getElementById('terminal-header');
+    const btnClose = document.getElementById('btn-close');
+    const btnMinimize = document.getElementById('btn-minimize');
+    const btnMaximize = document.getElementById('btn-maximize');
+    
+    const iconTerminal = document.getElementById('icon-terminal');
+    const iconReadme = document.getElementById('icon-readme');
+    const iconLixeira = document.getElementById('icon-lixeira');
+    
+    const btnStartMenu = document.getElementById('btn-start-menu');
+    const startMenuPopup = document.getElementById('start-menu-popup');
+    const startMenuTerminal = document.getElementById('start-menu-terminal');
+    const startMenuReadme = document.getElementById('start-menu-readme');
+    const startMenuNdi = document.getElementById('start-menu-ndi');
+    const startMenuSaas = document.getElementById('start-menu-saas');
+    const startMenuIa = document.getElementById('start-menu-ia');
+    const startMenuAjustes = document.getElementById('start-menu-ajustes');
+    const startMenuRecTerminal = document.getElementById('start-menu-rec-terminal');
+    const startMenuRecReadme = document.getElementById('start-menu-rec-readme');
+    const startMenuPower = document.getElementById('start-menu-power');
+    
+    const taskbarTerminalTab = document.getElementById('taskbar-terminal-tab');
+    const taskbarTerminalStatusDot = document.getElementById('taskbar-terminal-status-dot');
+    const systemClock = document.getElementById('system-clock');
+
+    // --- VSL OS Window Manager States & Elements ---
+    let vslWindowOpen = false;
+    let vslWindowMinimized = false;
+    let vslWindowMaximized = false;
+    let vslPosition = { x: 80, y: 50 };
+    let isVslDragging = false;
+    const vslDragRef = { startX: 0, startY: 0, posX: 80, posY: 50 };
+
+    // VSL locked and loading states
+    let vslLoading = true;
+    let vslLocked = true;
+    let vslProceeded = false;
+    let vslLoadingTimer = null;
+    let vslLockTimer = null;
+
+    function clearVslTimers() {
+      if (vslLoadingTimer) clearTimeout(vslLoadingTimer);
+      if (vslLockTimer) clearTimeout(vslLockTimer);
+      vslLoadingTimer = null;
+      vslLockTimer = null;
+    }
+
+    const vslDragWrapper = document.getElementById('vsl-window-drag-wrapper');
+    const vslWindow = document.getElementById('vsl-window');
+    const vslHeader = document.getElementById('vsl-header');
+    const btnVslClose = document.getElementById('btn-vsl-close');
+    const btnVslMinimize = document.getElementById('btn-vsl-minimize');
+    const btnVslMaximize = document.getElementById('btn-vsl-maximize');
+    const taskbarVslTab = document.getElementById('taskbar-vsl-tab');
+    const taskbarVslStatusDot = document.getElementById('taskbar-vsl-status-dot');
+
+    // 1. Matrix Rain Background Setup
+    let columns = [];
+    const fontSize = 14;
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const totalColumns = Math.floor(canvas.width / fontSize);
+      columns = Array.from({ length: totalColumns }).map(() => Math.random() * -100);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const charList = "01$ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz$#@<>[]/\\".split("");
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(3, 5, 10, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = '#2bd87a';
+      ctx.font = `${fontSize}px monospace`;
+      
+      for (let i = 0; i < columns.length; i++) {
+        const text = charList[Math.floor(Math.random() * charList.length)];
+        const x = i * fontSize;
+        const y = columns[i] * fontSize;
+        
+        ctx.fillText(text, x, y);
+        
+        if (y > canvas.height && Math.random() > 0.985) {
+          columns[i] = 0;
+        }
+        columns[i]++;
+      }
+    }
+    setInterval(drawMatrix, 40);
+
+    // 2. Dynamic Gutter Update & Window Visual Management
+    function updateGutter() {
+      if (!terminalBody || !terminalGutter) return;
+      const totalHeight = terminalBody.scrollHeight;
+      const lineHeight = 24; // 24px per line
+      const totalLines = Math.max(35, Math.ceil(totalHeight / lineHeight));
+      
+      let gutterHTML = '';
+      for (let i = 1; i <= totalLines; i++) {
+        gutterHTML += `<div class="gutter-line">${String(i).padStart(2, '0')}</div>`;
+      }
+      terminalGutter.innerHTML = gutterHTML;
+      
+      const lineColCounter = document.getElementById('line-col-counter');
+      if (lineColCounter) {
+        lineColCounter.textContent = `LN ${totalLines}, COL 1`;
+      }
+    }
+
+    function updateClock() {
+      if (systemClock) {
+        const now = new Date();
+        systemClock.textContent = now.toLocaleTimeString('pt-BR');
+      }
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    function updateWindowVisuals(triggerCRT = false) {
+      if (!dragWrapper || !terminalWindow || !scrollContainer || !taskbarTerminalTab) return;
+
+      // 1. Window Wrapper visibility and translation
+      if (windowOpen && !windowMinimized) {
+        dragWrapper.classList.remove('hidden');
+        if (windowMaximized) {
+          dragWrapper.style.transform = '';
+          dragWrapper.className = "fixed inset-0 z-30 flex flex-col w-screen h-screen max-w-none";
+        } else {
+          dragWrapper.style.transform = `translate(${position.x}px, ${position.y}px)`;
+          dragWrapper.className = "w-full max-w-4xl z-10 flex flex-col transition-all duration-75";
+        }
+      } else {
+        dragWrapper.classList.add('hidden');
+      }
+
+      // 2. Terminal Window border/radius & CRT class
+      if (windowMaximized) {
+        terminalWindow.className = "w-full bg-hacker-dark/85 backdrop-blur-md border-none overflow-hidden flex flex-col flex-1 rounded-none h-full";
+        scrollContainer.className = "flex flex-1 overflow-y-auto text-sm leading-6 max-h-none h-full no-scrollbar";
+      } else {
+        terminalWindow.className = "w-full bg-hacker-dark/85 backdrop-blur-md border border-hacker-green/35 overflow-hidden flex flex-col flex-1 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)]";
+        scrollContainer.className = "flex flex-1 min-h-[550px] max-h-[800px] overflow-y-auto text-sm leading-6 no-scrollbar";
+      }
+
+      if (triggerCRT) {
+        terminalWindow.classList.add('crt-animate-open');
+      }
+
+      // 3. Taskbar Tab style and indicator
+      if (windowOpen) {
+        taskbarTerminalTab.classList.remove('hidden');
+        if (!windowMinimized) {
+          taskbarTerminalTab.className = "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs border transition-all duration-200 cursor-pointer bg-hacker-green/15 text-hacker-green border-hacker-green/40 shadow-[0_0_5px_rgba(43,216,122,0.15)]";
+          if (taskbarTerminalStatusDot) {
+            taskbarTerminalStatusDot.classList.remove('hidden');
+          }
+        } else {
+          taskbarTerminalTab.className = "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs border transition-all duration-200 cursor-pointer bg-hacker-gray/5 text-hacker-gray border-hacker-gray/20 hover:bg-hacker-gray/10";
+          if (taskbarTerminalStatusDot) {
+            taskbarTerminalStatusDot.classList.add('hidden');
+          }
+        }
+      } else {
+        taskbarTerminalTab.classList.add('hidden');
+      }
+      
+      updateGutter();
+    }
+
+    function updateVslControlsVisuals() {
+      const controlsBar = document.getElementById('vsl-controls-bar');
+      const loadingOverlay = document.getElementById('vsl-loading-overlay');
+      const blindShield = document.getElementById('vsl-blind-shield');
+      
+      // Update loading overlay visibility
+      if (loadingOverlay) {
+        if (vslLoading) {
+          loadingOverlay.classList.remove('hidden');
+        } else {
+          loadingOverlay.classList.add('hidden');
+        }
+      }
+
+      // Update blind shield
+      if (blindShield) {
+        if (vslProceeded) {
+          blindShield.classList.add('hidden');
+        } else {
+          blindShield.classList.remove('hidden');
+        }
+      }
+      
+      // Update header buttons
+      if (vslLocked) {
+        if (btnVslClose) {
+          btnVslClose.className = "w-3 h-3 rounded-full bg-[#ff5f56] opacity-30 cursor-not-allowed transition-all";
+          btnVslClose.title = "Bloqueado (Aguarde)";
+        }
+        if (btnVslMinimize) {
+          btnVslMinimize.className = "w-3 h-3 rounded-full bg-[#ffbd2e] opacity-30 cursor-not-allowed transition-all";
+          btnVslMinimize.title = "Bloqueado (Aguarde)";
+        }
+        if (btnVslMaximize) {
+          btnVslMaximize.className = "w-3 h-3 rounded-full bg-[#57a5e5] opacity-30 cursor-not-allowed transition-all";
+          btnVslMaximize.title = "Bloqueado (Aguarde)";
+        }
+      } else {
+        if (btnVslClose) {
+          btnVslClose.className = "w-3 h-3 rounded-full bg-[#ff5f56] cursor-pointer hover:brightness-125 hover:shadow-[0_0_6px_rgba(255,95,86,0.8)] transition-all";
+          btnVslClose.title = "Fechar";
+        }
+        if (btnVslMinimize) {
+          btnVslMinimize.className = "w-3 h-3 rounded-full bg-[#ffbd2e] cursor-pointer hover:brightness-125 hover:shadow-[0_0_6px_rgba(255,189,46,0.8)] transition-all";
+          btnVslMinimize.title = "Minimizar";
+        }
+        if (btnVslMaximize) {
+          btnVslMaximize.className = "w-3 h-3 rounded-full bg-[#57a5e5] cursor-pointer hover:brightness-125 hover:shadow-[0_0_6px_rgba(87,165,229,0.8)] transition-all";
+          btnVslMaximize.title = vslWindowMaximized ? "Restaurar" : "Maximizar";
+        }
+      }
+      
+      if (!controlsBar) return;
+
+      if (vslProceeded) {
+        const isMuted = ytPlayer && typeof ytPlayer.isMuted === 'function' ? ytPlayer.isMuted() : true;
+        const muteText = isMuted ? "DESMUTAR" : "SILENCIAR";
+        const muteClass = isMuted 
+          ? "px-3 py-1.5 bg-[#ff5f56] text-white font-bold text-xs uppercase hover:bg-[#d63f37] transition-all rounded shadow-[0_0_8px_rgba(255,95,86,0.2)] cursor-pointer"
+          : "px-3 py-1.5 bg-[#6272a4] text-white font-bold text-xs uppercase hover:bg-[#4a5578] transition-all rounded cursor-pointer";
+
+        controlsBar.innerHTML = `
+          <div class="flex gap-2">
+            <button 
+              id="btn-vsl-playpause" 
+              class="px-3 py-1.5 bg-[#2bd87a] text-[#03050a] font-bold text-xs uppercase hover:bg-[#1b8a4e] hover:text-white transition-all rounded shadow-[0_0_8px_rgba(43,216,122,0.2)] cursor-pointer"
+            >
+              ▶/⏸ Play/Pause
+            </button>
+            <button 
+              id="btn-vsl-seek-back" 
+              class="px-3 py-1.5 bg-[#6272a4] hover:bg-[#4a5578] text-white font-bold text-xs uppercase transition-all rounded cursor-pointer"
+            >
+              ⏪ -10s
+            </button>
+            <button 
+              id="btn-vsl-seek-fwd" 
+              class="px-3 py-1.5 bg-[#6272a4] hover:bg-[#4a5578] text-white font-bold text-xs uppercase transition-all rounded cursor-pointer"
+            >
+              ⏩ +10s
+            </button>
+          </div>
+          <button 
+            id="btn-vsl-mute-toggle"
+            class="${muteClass}"
+          >
+            ${muteText}
+          </button>
+        `;
+
+        // Bind events
+        const btnPlayPause = document.getElementById('btn-vsl-playpause');
+        if (btnPlayPause) {
+          btnPlayPause.onclick = function() {
+            if (!ytPlayer || typeof ytPlayer.getPlayerState !== 'function') return;
+            try {
+              const state = ytPlayer.getPlayerState();
+              if (state === 1) { // 1 = playing
+                ytPlayer.pauseVideo();
+              } else {
+                ytPlayer.playVideo();
+              }
+            } catch(e) {}
+          };
+        }
+
+        const btnSeekBack = document.getElementById('btn-vsl-seek-back');
+        if (btnSeekBack) {
+          btnSeekBack.onclick = function() {
+            if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+            try {
+              const curr = ytPlayer.getCurrentTime();
+              ytPlayer.seekTo(Math.max(0, curr - 10), true);
+            } catch(e) {}
+          };
+        }
+
+        const btnSeekFwd = document.getElementById('btn-vsl-seek-fwd');
+        if (btnSeekFwd) {
+          btnSeekFwd.onclick = function() {
+            if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+            try {
+              const curr = ytPlayer.getCurrentTime();
+              const dur = ytPlayer.getDuration();
+              ytPlayer.seekTo(Math.min(dur, curr + 10), true);
+            } catch(e) {}
+          };
+        }
+
+        const btnMuteToggle = document.getElementById('btn-vsl-mute-toggle');
+        if (btnMuteToggle) {
+          btnMuteToggle.onclick = function() {
+            if (!ytPlayer || typeof ytPlayer.isMuted !== 'function') return;
+            try {
+              if (ytPlayer.isMuted()) {
+                ytPlayer.unMute();
+              } else {
+                ytPlayer.mute();
+              }
+              updateVslControlsVisuals();
+            } catch(e) {}
+          };
+        }
+      } else {
+        const audioBtnHtml = vslLocked
+          ? `<button id="btn-vsl-audio-ctrl" disabled class="px-4 py-1.5 bg-[#6272a4]/20 text-[#6272a4]/50 cursor-not-allowed border border-[#6272a4]/10 font-bold text-xs uppercase transition-all rounded">DESMUTAR VÍDEO</button>`
+          : (ytPlayer && typeof ytPlayer.isMuted === 'function' && !ytPlayer.isMuted()
+              ? `<button id="btn-vsl-audio-ctrl" class="px-4 py-1.5 bg-[#6272a4] text-white font-bold text-xs uppercase hover:bg-[#4a5578] transition-all rounded cursor-pointer">SILENCIAR VÍDEO</button>`
+              : `<button id="btn-vsl-audio-ctrl" class="px-4 py-1.5 bg-[#ff5f56] text-white font-bold text-xs uppercase hover:bg-[#d63f37] transition-all rounded shadow-[0_0_8px_rgba(255,95,86,0.2)] cursor-pointer">DESMUTAR VÍDEO</button>`);
+
+        const proceedBtnHtml = vslLocked
+          ? `<button id="btn-vsl-proceed-ctrl" disabled class="px-4 py-1.5 bg-[#6272a4]/20 text-[#6272a4]/50 cursor-not-allowed border border-[#6272a4]/10 font-bold text-xs uppercase transition-all rounded">AVANÇAR PARA APLICAÇÃO</button>`
+          : `<button id="btn-vsl-proceed-ctrl" class="px-4 py-1.5 bg-[#2bd87a] text-[#03050a] font-bold text-xs uppercase hover:bg-[#1b8a4e] hover:text-white transition-all rounded shadow-[0_0_8px_rgba(43,216,122,0.2)] cursor-pointer">AVANÇAR PARA APLICAÇÃO</button>`;
+
+        controlsBar.innerHTML = audioBtnHtml + proceedBtnHtml;
+
+        // Bind events
+        const audioBtn = document.getElementById('btn-vsl-audio-ctrl');
+        if (audioBtn && !vslLocked) {
+          audioBtn.onclick = function() {
+            if (!ytPlayer || typeof ytPlayer.isMuted !== 'function') return;
+            try {
+              if (ytPlayer.isMuted()) {
+                ytPlayer.unMute();
+              } else {
+                ytPlayer.mute();
+              }
+              updateVslControlsVisuals();
+            } catch(e) {}
+          };
+        }
+
+        const proceedBtn = document.getElementById('btn-vsl-proceed-ctrl');
+        if (proceedBtn && !vslLocked) {
+          proceedBtn.onclick = function() {
+            vslProceeded = true;
+            updateVslControlsVisuals();
+            submitAnswer(questions[currentQuestionIndex], "VSL Assistida");
+          };
+        }
+      }
+    }
+
+    function updateVslTerminalUI() {
+      const q = questions[currentQuestionIndex];
+      if (!q || q.type !== 'vsl') return;
+      
+      const container = document.getElementById('active-input-container');
+      if (!container) return;
+      
+      if (vslWindowOpen) {
+        container.innerHTML = `
+          <div class="pl-6 space-y-3" id="vsl-terminal-prompt-container">
+            <div class="text-hacker-yellow font-semibold flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-hacker-yellow animate-pulse"></span>
+              [JANELA REPRODUTORA VSL ATIVA]
+            </div>
+            <p class="text-xs text-hacker-gray max-w-lg leading-relaxed font-mono">
+              O reprodutor de vídeo de apresentação foi iniciado em uma janela separada na sua Área de Trabalho. Assista ao vídeo de introdução para prosseguir.
+            </p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="pl-6 space-y-3" id="vsl-terminal-prompt-container">
+            <div class="text-[#ff5f56] font-semibold flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56] animate-pulse"></span>
+              [CONEXÃO VSL ENCERRADA]
+            </div>
+            <p class="text-xs text-hacker-gray max-w-lg leading-relaxed font-mono">
+              A janela de vídeo foi fechada ou a transmissão foi concluída. Você pode reabrir o vídeo ou continuar com a aplicação.
+            </p>
+            <div class="flex gap-4 pt-1">
+              <button 
+                id="btn-reopen-vsl"
+                class="px-4 py-1.5 border border-hacker-yellow text-hacker-yellow hover:bg-hacker-yellow hover:text-hacker-black font-bold uppercase text-xs tracking-wider transition-all duration-300 rounded cursor-pointer"
+              >
+                Reabrir Janela VSL
+              </button>
+              <button 
+                id="btn-ignore-vsl"
+                class="px-4 py-1.5 border border-hacker-green text-hacker-green hover:bg-hacker-green hover:text-hacker-black font-bold uppercase text-xs tracking-wider transition-all duration-300 rounded cursor-pointer"
+              >
+                Ignorar e Avançar
+              </button>
+            </div>
+          </div>
+        `;
+        
+        const btnReopen = document.getElementById('btn-reopen-vsl');
+        if (btnReopen) {
+          btnReopen.onclick = function() {
+            vslWindowOpen = true;
+            vslWindowMinimized = false;
+            updateVslWindowVisuals();
+            initYouTubeVSL();
+          };
+        }
+        
+        const btnIgnore = document.getElementById('btn-ignore-vsl');
+        if (btnIgnore) {
+          btnIgnore.onclick = function() {
+            stopVslVideo();
+            vslWindowOpen = false;
+            updateVslWindowVisuals();
+            submitAnswer(q, "VSL Assistida");
+          };
+        }
+      }
+    }
+
+    function updateVslWindowVisuals() {
+      if (!vslDragWrapper || !vslWindow || !taskbarVslTab) return;
+
+      if (vslWindowOpen && !vslWindowMinimized) {
+        vslDragWrapper.classList.remove('hidden');
+        if (vslWindowMaximized) {
+          vslDragWrapper.style.transform = '';
+          vslDragWrapper.style.left = '';
+          vslDragWrapper.style.top = '';
+          vslDragWrapper.className = "fixed inset-0 z-30 flex flex-col w-screen h-screen max-w-none";
+        } else {
+          vslDragWrapper.style.left = '50%';
+          vslDragWrapper.style.top = '50%';
+          vslDragWrapper.style.transform = `translate(calc(-50% + ${vslPosition.x}px), calc(-50% + ${vslPosition.y}px))`;
+          vslDragWrapper.className = "absolute z-20 flex flex-col w-full max-w-xl transition-all duration-75";
+        }
+      } else {
+        vslDragWrapper.classList.add('hidden');
+      }
+
+      if (vslWindowMaximized) {
+        vslWindow.className = "w-full bg-[#070b13]/90 backdrop-blur-md border-none overflow-hidden flex flex-col flex-1 rounded-none h-full";
+      } else {
+        vslWindow.className = "w-full bg-[#070b13]/90 backdrop-blur-md border border-[#ff5f56]/30 overflow-hidden flex flex-col flex-1 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)]";
+      }
+
+      if (vslWindowOpen) {
+        taskbarVslTab.classList.remove('hidden');
+        if (!vslWindowMinimized) {
+          taskbarVslTab.className = "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs border transition-all duration-200 cursor-pointer bg-hacker-red/15 text-[#ff5f56] border-[#ff5f56]/40 shadow-[0_0_5px_rgba(255,95,86,0.15)]";
+          if (taskbarVslStatusDot) {
+            taskbarVslStatusDot.classList.remove('hidden');
+          }
+        } else {
+          taskbarVslTab.className = "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs border transition-all duration-200 cursor-pointer bg-hacker-gray/5 text-hacker-gray border-hacker-gray/20 hover:bg-hacker-gray/10";
+          if (taskbarVslStatusDot) {
+            taskbarVslStatusDot.classList.add('hidden');
+          }
+        }
+      } else {
+        taskbarVslTab.classList.add('hidden');
+      }
+
+      updateVslControlsVisuals();
+      updateVslTerminalUI();
+    }
+
+    if (terminalWindow) {
+      terminalWindow.addEventListener('animationend', () => {
+        terminalWindow.classList.remove('crt-animate-open');
+      });
+    }
+
+    // Draggable Window Logic (Mouse + Touch)
+    function handleMouseDown(e) {
+      if (e.button !== 0 || windowMaximized) return; // Only left click and if not maximized
+      isDragging = true;
+      dragRef.startX = e.clientX;
+      dragRef.startY = e.clientY;
+      dragRef.posX = position.x;
+      dragRef.posY = position.y;
+      e.preventDefault();
+    }
+
+    function handleTouchStart(e) {
+      if (e.touches.length !== 1 || windowMaximized) return;
+      isDragging = true;
+      dragRef.startX = e.touches[0].clientX;
+      dragRef.startY = e.touches[0].clientY;
+      dragRef.posX = position.x;
+      dragRef.posY = position.y;
+    }
+
+    function handleVslMouseDown(e) {
+      if (e.button !== 0 || vslWindowMaximized) return;
+      isVslDragging = true;
+      vslDragRef.startX = e.clientX;
+      vslDragRef.startY = e.clientY;
+      vslDragRef.posX = vslPosition.x;
+      vslDragRef.posY = vslPosition.y;
+      e.preventDefault();
+    }
+
+    function handleVslTouchStart(e) {
+      if (e.touches.length !== 1 || vslWindowMaximized) return;
+      isVslDragging = true;
+      vslDragRef.startX = e.touches[0].clientX;
+      vslDragRef.startY = e.touches[0].clientY;
+      vslDragRef.posX = vslPosition.x;
+      vslDragRef.posY = vslPosition.y;
+    }
+
+    function handlePointerMove(clientX, clientY) {
+      if (isDragging) {
+        const dx = clientX - dragRef.startX;
+        const dy = clientY - dragRef.startY;
+        position.x = dragRef.posX + dx;
+        position.y = dragRef.posY + dy;
+        
+        if (windowOpen && !windowMinimized && !windowMaximized) {
+          dragWrapper.style.transform = `translate(${position.x}px, ${position.y}px)`;
+        }
+      }
+
+      if (isVslDragging) {
+        const dx = clientX - vslDragRef.startX;
+        const dy = clientY - vslDragRef.startY;
+        vslPosition.x = vslDragRef.posX + dx;
+        vslPosition.y = vslDragRef.posY + dy;
+        
+        if (vslWindowOpen && !vslWindowMinimized && !vslWindowMaximized) {
+          vslDragWrapper.style.transform = `translate(calc(-50% + ${vslPosition.x}px), calc(-50% + ${vslPosition.y}px))`;
+        }
+      }
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      handlePointerMove(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+      isVslDragging = false;
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length !== 1) return;
+      handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      isDragging = false;
+      isVslDragging = false;
+    });
+
+    if (terminalHeader) {
+      terminalHeader.addEventListener('mousedown', handleMouseDown);
+      terminalHeader.addEventListener('touchstart', handleTouchStart);
+    }
+
+    if (vslHeader) {
+      vslHeader.addEventListener('mousedown', handleVslMouseDown);
+      vslHeader.addEventListener('touchstart', handleVslTouchStart);
+    }
+
+    // Control buttons click handlers
+    if (btnClose) {
+      btnClose.onclick = function() {
+        windowOpen = false;
+        updateWindowVisuals();
+      };
+    }
+
+    if (btnMinimize) {
+      btnMinimize.onclick = function() {
+        windowMinimized = true;
+        updateWindowVisuals();
+      };
+    }
+
+    if (btnMaximize) {
+      btnMaximize.onclick = function() {
+        windowMaximized = !windowMaximized;
+        updateWindowVisuals();
+      };
+    }
+
+    if (btnVslClose) {
+      btnVslClose.onclick = function() {
+        if (vslLocked) return;
+        clearVslTimers();
+        vslWindowOpen = false;
+        updateVslWindowVisuals();
+        stopVslVideo();
+      };
+    }
+
+    if (btnVslMinimize) {
+      btnVslMinimize.onclick = function() {
+        if (vslLocked) return;
+        vslWindowMinimized = true;
+        updateVslWindowVisuals();
+      };
+    }
+
+    if (btnVslMaximize) {
+      btnVslMaximize.onclick = function() {
+        if (vslLocked) return;
+        vslWindowMaximized = !vslWindowMaximized;
+        updateVslWindowVisuals();
+      };
+    }
+
+    // Desktop icons click handlers
+    if (iconTerminal) {
+      iconTerminal.onclick = function() {
+        windowOpen = true;
+        windowMinimized = false;
+        updateWindowVisuals(true); // Trigger CRT animation
+      };
+    }
+
+    if (iconReadme) {
+      iconReadme.onclick = function() {
+        windowOpen = true;
+        windowMinimized = false;
+        updateWindowVisuals(true); // Trigger CRT animation
+      };
+    }
+
+    if (iconLixeira) {
+      iconLixeira.onclick = function() {
+        alert("Lixeira contendo: spaghetti_code.bak, abandoned_saas.tar.gz, empty_dreams.sh");
+      };
+    }
+
+    // Taskbar controls
+    if (taskbarTerminalTab) {
+      taskbarTerminalTab.onclick = function() {
+        if (windowMinimized) {
+          windowMinimized = false;
+          updateWindowVisuals(true); // Trigger CRT when restoring
+        } else {
+          windowMinimized = true;
+          updateWindowVisuals();
+        }
+      };
+    }
+
+    if (taskbarVslTab) {
+      taskbarVslTab.onclick = function() {
+        if (vslLocked) return;
+        if (vslWindowMinimized) {
+          vslWindowMinimized = false;
+          updateVslWindowVisuals();
+        } else {
+          vslWindowMinimized = true;
+          updateVslWindowVisuals();
+        }
+      };
+    }
+
+    // Start Menu controls
+    if (btnStartMenu) {
+      btnStartMenu.onclick = function(e) {
+        e.stopPropagation();
+        startMenuPopup.classList.toggle('hidden');
+      };
+    }
+
+    if (startMenuTerminal) {
+      startMenuTerminal.onclick = function() {
+        windowOpen = true;
+        windowMinimized = false;
+        startMenuPopup.classList.add('hidden');
+        updateWindowVisuals(true);
+      };
+    }
+
+    if (startMenuReadme) {
+      startMenuReadme.onclick = function() {
+        windowOpen = true;
+        windowMinimized = false;
+        startMenuPopup.classList.add('hidden');
+        updateWindowVisuals(true);
+      };
+    }
+
+    if (startMenuNdi) {
+      startMenuNdi.onclick = function() {
+        window.open('https://wa.me/5511999999999', '_blank');
+        startMenuPopup.classList.add('hidden');
+      };
+    }
+
+    if (startMenuSaas) {
+      startMenuSaas.onclick = function() {
+        alert('SaaS Engine: Iniciando ambiente de micro-SaaS...');
+        startMenuPopup.classList.add('hidden');
+      };
+    }
+
+    if (startMenuIa) {
+      startMenuIa.onclick = function() {
+        alert('IA Agent: Conectando com agente cognitivo...');
+        startMenuPopup.classList.add('hidden');
+      };
+    }
+
+    if (startMenuAjustes) {
+      startMenuAjustes.onclick = function() {
+        alert('Ajustes do HASH OS: Modificadores visuais carregados.');
+        startMenuPopup.classList.add('hidden');
+      };
+    }
+
+    if (startMenuRecTerminal) {
+      startMenuRecTerminal.onclick = function() {
+        windowOpen = true;
+        windowMinimized = false;
+        startMenuPopup.classList.add('hidden');
+        updateWindowVisuals(true);
+      };
+    }
+
+    if (startMenuRecReadme) {
+      startMenuRecReadme.onclick = function() {
+        windowOpen = true;
+        windowMinimized = false;
+        startMenuPopup.classList.add('hidden');
+        updateWindowVisuals(true);
+      };
+    }
+
+    if (startMenuPower) {
+      startMenuPower.onclick = function() {
+        if (confirm("Deseja reiniciar a sessão?")) {
+          window.location.reload();
+        }
+      };
+    }
+
+    // Close start menu when clicking outside
+    document.addEventListener('click', function(e) {
+      if (startMenuPopup && !startMenuPopup.classList.contains('hidden')) {
+        if (e.target !== btnStartMenu && !btnStartMenu.contains(e.target) && e.target !== startMenuPopup && !startMenuPopup.contains(e.target)) {
+          startMenuPopup.classList.add('hidden');
+        }
+      }
+    });
+
+    // Initial positioning setup
+    updateWindowVisuals(false);
+
+    // Auto-scroll inside terminal container
+    function autoScroll() {
+      setTimeout(() => {
+        if (scrollContainer) {
+          scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        }
+        updateGutter();
+      }, 50);
+    }
+
+    // 3. Scramble Text implementation (sutil e acelerado, estilo digitação terminal)
+    function runScrambleText(targetText, onUpdate, onComplete, options = {}) {
+      const cursor = options.cursor || "░▒▓█";
+      const duration = options.duration !== undefined ? options.duration : Math.min(1800, Math.max(300, targetText.length * 10));
+      
+      const length = targetText.length;
+      if (length === 0) {
+        onUpdate("");
+        if (onComplete) onComplete();
+        return () => {};
+      }
+      
+      const start = performance.now();
+      let frameId;
+      
+      const tick = (now) => {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Curva de aceleração quadrática para digitação progressiva
+        const easeProgress = 0.6 * Math.pow(progress, 2) + 0.4 * progress;
+        const settledCount = Math.floor(easeProgress * length);
+        
+        let result = "";
+        for (let i = 0; i < length; i++) {
+          if (i < settledCount) {
+            result += targetText[i];
+          } else if (i === settledCount) {
+            const cursorChar = cursor[Math.floor(Math.random() * cursor.length)] || "█";
+            result += cursorChar;
+          } else {
+            break; // Oculta caracteres futuros completamente
+          }
+        }
+        
+        onUpdate(result);
+        
+        if (progress < 1) {
+          frameId = requestAnimationFrame(tick);
+        } else {
+          onUpdate(targetText);
+          if (onComplete) onComplete();
+        }
+      };
+      
+      frameId = requestAnimationFrame(tick);
+      return () => cancelAnimationFrame(frameId);
+    }
+
+    // Helper para animar nós de texto HTML preservando tags e estilizações (spans de cores)
+    function runDOMScramble(element, duration = 1000, onComplete = null, options = {}) {
+      const cursor = options.cursor || "░▒▓█";
+      
+      const textNodes = [];
+      let globalLength = 0;
+      
+      function collectTextNodes(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const text = node.nodeValue || "";
+          textNodes.push({
+            node: node,
+            originalText: text,
+            startIdx: globalLength,
+            endIdx: globalLength + text.length
+          });
+          globalLength += text.length;
+        } else {
+          if (node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE') {
+            for (let i = 0; i < node.childNodes.length; i++) {
+              collectTextNodes(node.childNodes[i]);
+            }
+          }
+        }
+      }
+      
+      collectTextNodes(element);
+      
+      if (globalLength === 0) {
+        if (onComplete) onComplete();
+        return () => {};
+      }
+      
+      textNodes.forEach(item => {
+        item.node.nodeValue = "";
+      });
+      
+      const start = performance.now();
+      let frameId;
+      
+      const tick = (now) => {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Curva de aceleração quadrática para digitação progressiva
+        const easeProgress = 0.6 * Math.pow(progress, 2) + 0.4 * progress;
+        const globalSettledCount = Math.floor(easeProgress * globalLength);
+        
+        textNodes.forEach(item => {
+          let result = "";
+          for (let i = 0; i < item.originalText.length; i++) {
+            const globalIdx = item.startIdx + i;
+            
+            if (globalIdx < globalSettledCount) {
+              result += item.originalText[i];
+            } else if (globalIdx === globalSettledCount) {
+              const cursorChar = cursor[Math.floor(Math.random() * cursor.length)] || "█";
+              result += cursorChar;
+            } else {
+              break; // Oculta caracteres futuros completamente
+            }
+          }
+          item.node.nodeValue = result;
+        });
+        
+        if (options.onUpdate) options.onUpdate();
+        
+        if (progress < 1) {
+          frameId = requestAnimationFrame(tick);
+        } else {
+          textNodes.forEach(item => {
+            item.node.nodeValue = item.originalText;
+          });
+          if (options.onUpdate) options.onUpdate();
+          if (onComplete) onComplete();
+        }
+      };
+      
+      frameId = requestAnimationFrame(tick);
+      return () => {
+        cancelAnimationFrame(frameId);
+        textNodes.forEach(item => {
+          item.node.nodeValue = item.originalText;
+        });
+      };
+    }
+
+    // Função auxiliar para iniciar a sequência de boot após o preloader sumir
+    function startBootSequence() {
+      updateGutter();
+      
+      const cmdText = "cat README.md";
+      const cmdElement = document.getElementById('boot-command');
+      
+      // 1. Scramble para digitar o comando "cat README.md"
+      runScrambleText(
+        cmdText,
+        (text) => {
+          cmdElement.textContent = text;
+        },
+        () => {
+          document.getElementById('boot-cursor-cmd').style.display = 'none';
+          
+          // Show ASCII Banner
+          setTimeout(() => {
+            const glitchArt = document.getElementById('glitch-art');
+            glitchArt.setAttribute('data-text', ASCII_ART);
+            glitchArt.textContent = ASCII_ART;
+            document.getElementById('boot-banner-container').classList.remove('hidden');
+            autoScroll();
+            
+            // Start Manifesto scramble
+            setTimeout(() => {
+              document.getElementById('boot-manifesto-container').classList.remove('hidden');
+              const manifestoElement = document.getElementById('manifesto-text');
+              
+              runScrambleText(
+                MANIFESTO_TEXT,
+                (text) => {
+                  manifestoElement.textContent = text;
+                  autoScroll();
+                },
+                () => {
+                  // Show Directory Tree
+                  const treeContainer = document.getElementById('tree-container');
+                  treeContainer.classList.remove('hidden');
+                  autoScroll();
+                  
+                  // Anima a árvore de diretórios preservando cores
+                  runDOMScramble(treeContainer, 1200, () => {
+                    // Show Boot Button
+                    setTimeout(() => {
+                      document.getElementById('start-btn-container').classList.remove('hidden');
+                      autoScroll();
+                    }, 300);
+                  }, { onUpdate: autoScroll });
+                },
+                { duration: 2200, cursor: "░▒▓█" }
+              );
+            }, 600);
+          }, 300);
+        },
+        { duration: 800, cursor: "░▒▓█" }
+      );
+    }
+
+    // 4. Boot & Preloader Sequence Initialization
+    window.onload = function() {
+      updateGutter();
+      
+      const preloaderOverlay = document.getElementById('preloader-overlay');
+      const preloaderCmdContainer = document.getElementById('preloader-cmd-container');
+      const preloaderCmdText = document.getElementById('preloader-cmd-text');
+      const preloaderCmdCursor = document.getElementById('preloader-cmd-cursor');
+      const preloaderMainContainer = document.getElementById('preloader-main-container');
+      
+      const preloaderTitle = document.getElementById('preloader-title');
+      const preloaderTitleText = document.getElementById('preloader-title-text');
+      const preloaderTitleCursor = document.getElementById('preloader-title-cursor');
+      const preloaderSubtitleText = document.getElementById('preloader-subtitle-text');
+      const preloaderSubtitleCursor = document.getElementById('preloader-subtitle-cursor');
+      
+      const cmdText = "npm run hashman";
+      const titleText = "HASHMAN + NDI";
+      const subtitleText = "SaaS e IA";
+      
+      // 1. Digita o comando "npm run hashman"
+      runScrambleText(
+        cmdText,
+        (text) => {
+          preloaderCmdText.textContent = text;
+        },
+        () => {
+          // Quando termina de digitar o comando
+          setTimeout(() => {
+            preloaderCmdCursor.style.display = 'none';
+            preloaderMainContainer.classList.remove('hidden');
+            
+            // Oculta a linha de comando após um pequeno delay
+            setTimeout(() => {
+              preloaderCmdContainer.style.display = 'none';
+            }, 300);
+            
+            // 2. Inicia o scramble do título
+            runScrambleText(
+              titleText,
+              (text) => {
+                preloaderTitleText.textContent = text;
+              },
+              () => {
+                preloaderTitleCursor.classList.add('hidden');
+                preloaderTitle.classList.add('preloader-glitch'); // Ativa o glitch
+                
+                // 3. Espera 1s e inicia scramble do subtítulo
+                setTimeout(() => {
+                  preloaderSubtitleCursor.classList.remove('hidden');
+                  runScrambleText(
+                    subtitleText,
+                    (text) => {
+                      preloaderSubtitleText.textContent = text;
+                    },
+                    () => {
+                       // 4. Espera 1.2s antes de sumir o preloader (fade out)
+                       setTimeout(() => {
+                         preloaderSubtitleCursor.classList.add('hidden');
+                         preloaderOverlay.classList.add('opacity-0', 'pointer-events-none');
+                                                 
+                         // 5. Espera 600ms da transição do fade out e remove/esconde o elemento
+                         setTimeout(() => {
+                           preloaderOverlay.style.display = 'none';
+                           // Inicia a sequência de boot do terminal e abre a janela
+                           windowOpen = true;
+                           updateWindowVisuals(true);
+                           startBootSequence();
+                         }, 600);
+                       }, 1200);
+                    },
+                    { duration: 600, cursor: "░▒▓█" }
+                  );
+                }, 1000);
+              },
+              { duration: 1000, cursor: "░▒▓█" }
+            );
+          }, 400); // tempo de Enter
+        },
+        { duration: 1000, cursor: "░▒▓█" }
+      );
+    };
+
+    // 5. Click Start Button
+    document.getElementById('btn-start').onclick = function() {
+      // Hide button container
+      document.getElementById('start-btn-container').classList.add('hidden');
+      
+      // Show Chat Section
+      document.getElementById('chat-section').classList.remove('hidden');
+      autoScroll();
+      
+      const cmdText = "./apply_hash.sh";
+      const msg1Text = "Iniciando protocolo de aplicação HASH + NDI...";
+      const msg2Text = "Carregando sistema de perguntas do terminal. Digite as respostas ou selecione as opções.";
+      
+      // Digita o comando ./apply_hash.sh
+      runScrambleText(
+        cmdText,
+        (text) => {
+          document.getElementById('chat-cmd-text').textContent = text;
+          autoScroll();
+        },
+        () => {
+          document.getElementById('chat-cmd-cursor').style.display = 'none';
+          
+          setTimeout(() => {
+            const msg1Line = document.getElementById('chat-msg1-line');
+            msg1Line.classList.remove('hidden');
+            
+            // Digita a primeira mensagem de log
+            runScrambleText(
+              msg1Text,
+              (text) => {
+                document.getElementById('chat-msg1-text').textContent = text;
+                autoScroll();
+              },
+              () => {
+                document.getElementById('chat-msg1-cursor').style.display = 'none';
+                
+                setTimeout(() => {
+                  const msg2Line = document.getElementById('chat-msg2-line');
+                  msg2Line.classList.remove('hidden');
+                  
+                  // Digita a segunda mensagem de log
+                  runScrambleText(
+                    msg2Text,
+                    (text) => {
+                      document.getElementById('chat-msg2-text').textContent = text;
+                      autoScroll();
+                    },
+                    () => {
+                      // Concluído a introdução, agora inicia a primeira pergunta
+                      setTimeout(renderNextQuestion, 400);
+                    },
+                    { duration: 800 }
+                  );
+                }, 200);
+              },
+              { duration: 500 }
+            );
+          }, 200);
+        },
+        { duration: 600 }
+      );
+    };
+
+    // 6. Conversational Form State Engine
+    function renderNextQuestion() {
+      // Check if we reached the end of the questions list
+      if (currentQuestionIndex >= questions.length) {
+        showFinalScreen();
+        return;
+      }
+      
+      const q = questions[currentQuestionIndex];
+      
+      // Check conditionals
+      if (q.condition && !q.condition(userAnswers)) {
+        currentQuestionIndex++;
+        renderNextQuestion();
+        return;
+      }
+      
+      // Clear active elements
+      document.getElementById('active-question-text').textContent = "";
+      document.getElementById('active-input-container').innerHTML = "";
+      hideError();
+      
+      // Dynamic scramble of active question text
+      runScrambleText(
+        q.question,
+        (text) => {
+          document.getElementById('active-question-text').textContent = text;
+          autoScroll();
+        },
+        () => {
+          // Inject input elements based on question type
+          injectInput(q);
+          autoScroll();
+        },
+        { duration: 600, cursor: "░▒▓█" }
+      );
+    }
+
+    function injectInput(q) {
+      const container = document.getElementById('active-input-container');
+      container.innerHTML = "";
+      
+      if (q.type === 'text') {
+        container.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="text-hacker-blue">~/user$</span>
+            <input 
+              type="text" 
+              id="form-input-text" 
+              class="bg-hacker-input text-hacker-green border-b border-hacker-green/50 outline-none w-full max-w-md py-1 px-2 font-mono"
+              autocomplete="off"
+              placeholder="Digite sua resposta e aperte ENTER..."
+            />
+            <button id="btn-submit-q" class="px-4 py-1 bg-hacker-green text-hacker-black font-bold hover:bg-hacker-greenDim hover:text-white transition-all text-xs">[ENVIAR]</button>
+          </div>
+        `;
+        const input = document.getElementById('form-input-text');
+        input.focus();
+        
+        // Key listener
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            submitAnswer(q, input.value.trim());
+          }
+        });
+        
+        document.getElementById('btn-submit-q').onclick = () => {
+          submitAnswer(q, input.value.trim());
+        };
+      } 
+      else if (q.type === 'textarea') {
+        container.innerHTML = `
+          <div class="flex flex-col gap-2 w-full max-w-lg">
+            <span class="text-hacker-blue">~/user$ [Use Shift+Enter para quebra de linha]</span>
+            <textarea 
+              id="form-input-textarea" 
+              rows="3" 
+              class="bg-hacker-input text-hacker-green border border-hacker-green/30 outline-none w-full p-2 font-mono"
+              placeholder="Digite aqui..."
+            ></textarea>
+            <button id="btn-submit-q" class="px-4 py-1.5 bg-hacker-green text-hacker-black font-bold hover:bg-hacker-greenDim hover:text-white self-end transition-all text-xs">[ENVIAR]</button>
+          </div>
+        `;
+        const textarea = document.getElementById('form-input-textarea');
+        textarea.focus();
+        
+        // Listeners
+        textarea.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            submitAnswer(q, textarea.value.trim());
+          }
+        });
+        
+        document.getElementById('btn-submit-q').onclick = () => {
+          submitAnswer(q, textarea.value.trim());
+        };
+      }
+      else if (q.type === 'radio') {
+        let optionsHTML = "";
+        q.options.forEach((opt, idx) => {
+          const keyLetter = String.fromCharCode(65 + idx); // A, B, C, D...
+          optionsHTML += `
+            <div class="flex items-center gap-3 py-1 cursor-pointer hover:text-hacker-green group" onclick="selectRadio('${keyLetter}', '${opt}')">
+              <span class="px-2 py-0.5 rounded border border-hacker-green/40 group-hover:border-hacker-green bg-hacker-input text-xs text-hacker-green font-bold">[ ${keyLetter} ]</span>
+              <span class="text-hacker-text font-mono">${opt}</span>
+            </div>
+          `;
+        });
+        
+        container.innerHTML = `
+          <div class="space-y-2">
+            ${optionsHTML}
+            <div class="text-[10px] text-hacker-gray mt-2">* Pressione a tecla correspondente (Ex: A) ou clique na opção.</div>
+          </div>
+        `;
+        
+        container.querySelectorAll('.text-hacker-text').forEach(el => runDOMScramble(el, 400));
+        
+        // Store window handler for keyboard navigation
+        window.keyboardOptionSelect = function(e) {
+          const char = e.key.toUpperCase();
+          const idx = char.charCodeAt(0) - 65;
+          if (idx >= 0 && idx < q.options.length) {
+            window.removeEventListener('keydown', window.keyboardOptionSelect);
+            submitAnswer(q, q.options[idx]);
+          }
+        };
+        window.addEventListener('keydown', window.keyboardOptionSelect);
+      }
+      else if (q.type === 'checkbox') {
+        let optionsHTML = "";
+        q.options.forEach((opt, idx) => {
+          const keyLetter = String.fromCharCode(65 + idx);
+          optionsHTML += `
+            <div class="flex items-center gap-3 py-1 cursor-pointer group" onclick="toggleCheckbox('${opt}', 'chk-${idx}')">
+              <input type="checkbox" id="chk-${idx}" value="${opt}" class="hidden" />
+              <span id="box-${idx}" class="px-2 py-0.5 rounded border border-hacker-gray/40 text-xs text-hacker-gray font-bold">[ _ ]</span>
+              <span class="px-1.5 text-xs text-hacker-green font-bold font-mono">${keyLetter}</span>
+              <span class="text-hacker-text font-mono">${opt}</span>
+            </div>
+          `;
+        });
+        
+        container.innerHTML = `
+          <div class="space-y-2">
+            ${optionsHTML}
+            <div class="flex items-center gap-4 pt-3">
+              <button id="btn-submit-checkbox" class="px-4 py-1 bg-hacker-green text-hacker-black font-bold hover:bg-hacker-greenDim hover:text-white transition-all text-xs">[CONFIRMAR SELEÇÃO]</button>
+            </div>
+            <div class="text-[10px] text-hacker-gray mt-1">* Clique para selecionar múltiplas opções. Pressione as letras para alternar e ENTER para avançar.</div>
+          </div>
+        `;
+        
+        container.querySelectorAll('.text-hacker-text').forEach(el => runDOMScramble(el, 400));
+        
+        // Track checked state
+        const selectedSet = new Set();
+        
+        window.toggleCheckbox = function(opt, elementId) {
+          const checkbox = document.getElementById(elementId);
+          const boxSpan = document.getElementById(elementId.replace('chk', 'box'));
+          checkbox.checked = !checkbox.checked;
+          
+          if (checkbox.checked) {
+            selectedSet.add(opt);
+            boxSpan.innerHTML = "[ <span class='text-hacker-green'>X</span> ]";
+            boxSpan.classList.add('border-hacker-green');
+            boxSpan.classList.remove('border-hacker-gray/40');
+          } else {
+            selectedSet.delete(opt);
+            boxSpan.innerHTML = "[ _ ]";
+            boxSpan.classList.remove('border-hacker-green');
+            boxSpan.classList.add('border-hacker-gray/40');
+          }
+        };
+        
+        // Keyboard handler
+        window.keyboardOptionSelect = function(e) {
+          if (e.key === 'Enter') {
+            window.removeEventListener('keydown', window.keyboardOptionSelect);
+            submitAnswer(q, Array.from(selectedSet));
+          } else {
+            const char = e.key.toUpperCase();
+            const idx = char.charCodeAt(0) - 65;
+            if (idx >= 0 && idx < q.options.length) {
+              window.toggleCheckbox(q.options[idx], `chk-${idx}`);
+            }
+          }
+        };
+        window.addEventListener('keydown', window.keyboardOptionSelect);
+        
+        document.getElementById('btn-submit-checkbox').onclick = () => {
+          window.removeEventListener('keydown', window.keyboardOptionSelect);
+          submitAnswer(q, Array.from(selectedSet));
+        };
+      }
+      else if (q.type === 'vsl') {
+        // Open VSL Window and update visuals
+        vslWindowOpen = true;
+        vslWindowMinimized = false;
+        updateVslWindowVisuals();
+
+        // Initialize/Play YouTube Player
+        initYouTubeVSL();
+      }
+    }
+
+    // Radio click helper
+    window.selectRadio = function(keyLetter, value) {
+      if (window.keyboardOptionSelect) {
+        window.removeEventListener('keydown', window.keyboardOptionSelect);
+      }
+      submitAnswer(questions[currentQuestionIndex], value);
+    };
+
+    // YouTube VSL setup
+    function initYouTubeVSL() {
+      vslLoading = true;
+      vslLocked = true;
+      clearVslTimers();
+      updateVslControlsVisuals();
+
+      if (ytPlayer) {
+        try {
+          ytPlayer.mute();
+          ytPlayer.playVideo();
+          
+          vslLoadingTimer = setTimeout(() => {
+            vslLoading = false;
+            try {
+              ytPlayer.unMute();
+              ytPlayer.playVideo();
+            } catch(e) {}
+            updateVslControlsVisuals();
+            
+            vslLockTimer = setTimeout(() => {
+              vslLocked = false;
+              updateVslControlsVisuals();
+            }, 5000);
+          }, 1000);
+        } catch(e) {}
+        return;
+      }
+      // If API loaded, construct player directly
+      if (typeof YT !== 'undefined' && YT.Player) {
+        createPlayer();
+      } else {
+        // Wait, standard onload for iframe API
+        window.onYouTubeIframeAPIReady = function() {
+          createPlayer();
+        };
+      }
+    }
+
+    function createPlayer() {
+      ytPlayer = new YT.Player('vsl-youtube-player', {
+        height: '100%',
+        width: '100%',
+        videoId: 'dYUDXp9eL4A',
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          modestbranding: 1,
+          rel: 0,
+          showinfo: 0,
+          mute: 1,
+          enablejsapi: 1,
+          origin: window.location.origin
+        },
+        events: {
+          'onReady': onPlayerReady
+        }
+      });
+    }
+
+    function onPlayerReady(event) {
+      if (vslProceeded) {
+        vslLoading = false;
+        vslLocked = false;
+        try {
+          event.target.unMute();
+          event.target.playVideo();
+        } catch(e) {}
+      } else {
+        // Play video muted initially
+        try {
+          event.target.mute();
+          event.target.playVideo();
+        } catch(e) {}
+        
+        vslLoadingTimer = setTimeout(() => {
+          vslLoading = false;
+          try {
+            event.target.unMute();
+            event.target.playVideo();
+          } catch(e) {}
+          updateVslControlsVisuals();
+          
+          vslLockTimer = setTimeout(() => {
+            vslLocked = false;
+            updateVslControlsVisuals();
+          }, 5000);
+        }, 1000);
+      }
+      
+      updateVslControlsVisuals();
+    }
+
+    function stopVslVideo() {
+      if (ytPlayer && typeof ytPlayer.stopVideo === 'function') {
+        try {
+          ytPlayer.stopVideo();
+        } catch(e) {}
+      }
+
+    // 7. Form Answer Submitting and Transition
+    function submitAnswer(q, value) {
+      // Clean previous keyboards
+      if (window.keyboardOptionSelect) {
+        window.removeEventListener('keydown', window.keyboardOptionSelect);
+      }
+      
+      // Validation Check
+      if (q.required && (!value || (Array.isArray(value) && value.length === 0))) {
+        showError();
+        return;
+      }
+      
+      hideError();
+      
+      // Clear inputs immediately to show loading bar
+      const container = document.getElementById('active-input-container');
+      container.innerHTML = "";
+      
+      let progress = 0;
+      const barLength = 20;
+      
+      function renderProgress() {
+        const filled = Math.floor((progress / 100) * barLength);
+        const empty = barLength - filled;
+        const filledStr = "█".repeat(filled);
+        const emptyStr = "░".repeat(empty);
+        
+        container.innerHTML = `
+          <div class="space-y-1 font-mono text-xs">
+            <div class="text-hacker-blue animate-pulse">~/system$ process_answer --sec-handshake</div>
+            <div class="text-hacker-green flex items-center gap-2">
+              <span class="tracking-widest">[${filledStr}<span class="text-hacker-green/20">${emptyStr}</span>]</span>
+              <span>${progress}%</span>
+              ${progress === 100 
+                ? '<span class="text-hacker-green font-bold">[OK]</span>' 
+                : '<span class="text-hacker-gray animate-pulse">[TRANSMITTING]</span>'
+              }
+            </div>
+          </div>
+        `;
+        autoScroll();
+      }
+      
+      renderProgress();
+      
+      const interval = setInterval(() => {
+        progress += 10;
+        if (progress >= 100) {
+          clearInterval(interval);
+          progress = 100;
+          renderProgress();
+          
+          setTimeout(() => {
+            // Save Answer
+            userAnswers[q.id] = value;
+            q.answer = value;
+            
+            // Render Log line
+            const history = document.getElementById('chat-history');
+            const logLine = document.createElement('div');
+            logLine.className = "space-y-1 border-b border-hacker-gray/5 pb-2";
+            
+            // Show question and answer in logs
+            const displayVal = Array.isArray(value) ? value.join(', ') : value;
+            logLine.innerHTML = `
+              <div class="text-hacker-gray font-bold">SYSTEM: ${q.question}</div>
+              <div class="pl-6"><span class="text-hacker-blue font-bold">~/user$</span> <span class="text-hacker-green">${displayVal}</span></div>
+            `;
+            history.appendChild(logLine);
+            
+            // Increment and process next
+            currentQuestionIndex++;
+            renderNextQuestion();
+          }, 150);
+        } else {
+          renderProgress();
+        }
+      }, 45);
+    }
+
+    // Error utilities
+    function showError() {
+      document.getElementById('error-message').classList.remove('hidden');
+      autoScroll();
+    }
+    function hideError() {
+      document.getElementById('error-message').classList.add('hidden');
+    }
+
+    // Lead Score Calculation
+    function calculateLeadScore() {
+      let score = 0;
+      const exp = userAnswers[6];
+      if (exp === 'Zero') score += 10;
+      else if (exp === 'Iniciante') score += 20;
+      else if (exp === 'Intermediário') score += 30;
+      else if (exp === 'Avançado') score += 40;
+      
+      const areas = userAnswers[7] || [];
+      if (Array.isArray(areas)) {
+        if (areas.includes('Nenhuma')) { score += 5; }
+        else { score += Math.min(30, areas.filter(a => a !== 'Nenhuma').length * 7); }
+      }
+      
+      const saas = userAnswers[9];
+      if (saas === 'Já fatura') score += 30;
+      else if (saas === 'Construindo MVP') score += 25;
+      else if (saas === 'Só tenho ideia') score += 15;
+      else if (saas === 'Quero descobrir') score += 10;
+      
+      return score;
+    }
+
+    function getPersonalizedPitch(score) {
+      if (score >= 75) {
+        return {
+          profile: 'Elite Founder', color: '#ffbd2e', badge: 'ELITE-FOUNDER-ACTIVE',
+          focus: 'Escala, Networking e Multiplicação com SaaS + IA',
+          text: 'Você demonstrou alto potencial de execução técnica e visão avançada de mercado. Founders com o seu perfil costumam enfrentar gargalos de escala, networking qualificado com outros fundadores e acesso a códigos e boilerplates que aceleram a infraestrutura dos seus sistemas. Na HASH_NDI e Comunidade NDI, você se conectará diretamente a quem está faturando alto com SaaS, acessará arquiteturas avançadas de IA e infra pronta para multiplicar seu faturamento.'
+        };
+      } else if (score >= 45) {
+        return {
+          profile: 'Solopreneur / Construtor Ativo', color: '#57a5e5', badge: 'SOLOPRENEUR-ACTIVE-BUILDER',
+          focus: 'Lançamento Acelerado e Monetização do MVP',
+          text: 'Você está na fase de maior aceleração: tirando a ideia do papel e construindo seu MVP. O seu principal gargalo hoje é o tempo e o foco em implementar as integrações corretas (gateways de pagamento, fluxos de IA, autenticação). Na HASH_NDI e Comunidade NDI, nós te fornecemos os templates Next.js prontos de alta conversão, tutoriais de automações e o feedback de uma comunidade ativa para você lançar e validar seu SaaS em tempo recorde.'
+        };
+      } else {
+        return {
+          profile: 'Aspiring Founder / Futuro Fundador', color: '#ff5f56', badge: 'ASPIRING-FOUNDER-INITIATE',
+          focus: 'Do Zero ao Primeiro MVP SaaS Validado',
+          text: 'Você está iniciando sua jornada rumo à liberdade digital e à criação do seu primeiro SaaS. Não se preocupe se não tem ampla experiência técnica: o ecossistema atual de low-code/no-code e inteligência artificial nivelou o jogo. Na HASH_NDI e Comunidade NDI, você terá o passo a passo absoluto do zero, templates copiáveis, tutoriais práticos e o suporte de membros seniores para validar e criar seu primeiro ativo digital recorrente.'
+        };
+      }
+    }
+
+    // 8. Compile and display final diagnostic summary screen with sequential typing
+    function showFinalScreen() {
+      // Hide active question container
+      document.getElementById('active-question-container').classList.add('hidden');
+      
+      // Calculate Lead Score
+      const score = calculateLeadScore();
+      const pitchData = getPersonalizedPitch(score);
+      
+      // Generate summary text
+      let report = `======================================================================
+                 DIAGNÓSTICO DA APLICAÇÃO HASH + NDI
+======================================================================
+DATA DA COMPILAÇÃO: ${new Date().toLocaleString('pt-BR')}
+SISTEMA DE SEGURANÇA: PROTOCOLO ATIVO
+SCORE DE EXECUÇÃO: ${score}/100 [PERFIL: ${pitchData.profile.toUpperCase()}]
+======================================================================
+
+`;
+
+      questions.forEach((q) => {
+        // Skip conditionals that weren't answered
+        if (q.condition && !q.condition(userAnswers)) return;
+        
+        let answerText = "Não informado";
+        if (q.answer) {
+          answerText = Array.isArray(q.answer) ? q.answer.join(', ') : q.answer;
+        }
+        
+        report += `[PERGUNTA ${String(q.id).padStart(2, '0')}] ${q.question}\n`;
+        report += `>> RESPOSTA: ${answerText}\n`;
+        report += `----------------------------------------------------------------------\n`;
+      });
+      
+      report += `[FIM DO RELATÓRIO - COMPILADO VIA HASH_NDI ENGINE v1.0.2]`;
+      
+      // Populate Pitch Dashboard
+      document.getElementById('pitch-profile-title').textContent = 'PERFIL: ' + pitchData.profile.toUpperCase();
+      document.getElementById('pitch-profile-title').style.color = pitchData.color;
+      document.getElementById('pitch-badge').textContent = pitchData.badge;
+      document.getElementById('pitch-score-badge').textContent = 'SCORE: ' + score + '/100';
+      document.getElementById('pitch-focus').textContent = pitchData.focus;
+      document.getElementById('pitch-text').textContent = pitchData.text;
+      
+      // Show screen
+      const finalSection = document.getElementById('final-section');
+      finalSection.classList.remove('hidden');
+      autoScroll();
+      
+      const msg1Line = document.getElementById('final-msg1-line');
+      const msg1Text = document.getElementById('final-msg1-text');
+      const msg1Cursor = document.getElementById('final-msg1-cursor');
+      
+      const msg2Line = document.getElementById('final-msg2-line');
+      const msg2Text = document.getElementById('final-msg2-text');
+      const msg2Cursor = document.getElementById('final-msg2-cursor');
+      
+      const reportContainer = document.getElementById('final-report-container');
+      const summaryBox = document.getElementById('summary-box');
+      
+      const actionsContainer = document.getElementById('final-actions-container');
+      
+      // 1. Digita a primeira linha do compiler
+      msg1Line.classList.remove('hidden');
+      runScrambleText(
+        "[ COMPILED ] Processando dados de aplicação HASH_NDI...",
+        (text) => {
+          msg1Text.textContent = text;
+          autoScroll();
+        },
+        () => {
+          msg1Cursor.style.display = 'none';
+          
+          setTimeout(() => {
+            msg2Line.classList.remove('hidden');
+            
+            // 2. Digita a segunda linha
+            runScrambleText(
+              `[ OK ] Aplicação compilada com sucesso. Score: ${score}/100. Relatório de Diagnóstico gerado.`,
+              (text) => {
+                msg2Text.textContent = text;
+                autoScroll();
+              },
+              () => {
+                msg2Cursor.style.display = 'none';
+                
+                setTimeout(() => {
+                  reportContainer.classList.remove('hidden');
+                  autoScroll();
+                  
+                  // 3. Digita o relatório
+                  runScrambleText(
+                    report,
+                    (text) => {
+                      summaryBox.textContent = text;
+                      autoScroll();
+                    },
+                    () => {
+                      actionsContainer.classList.remove('hidden');
+                      autoScroll();
+                    },
+                    { duration: 1500 }
+                  );
+                }, 300);
+              },
+              { duration: 600 }
+            );
+          }, 300);
+        },
+        { duration: 600 }
+      );
+      
+      // Set up buttons action click
+      setupActions(report);
+      
+      // Set up checkout CTA
+      const checkoutCta = document.getElementById('btn-checkout-cta');
+      if (checkoutCta) {
+        checkoutCta.onclick = function() {
+          openCheckoutWindow();
+        };
+      }
+    }
+
+    // 9. Actions Setup (WhatsApp, Email, Copy)
+    function setupActions(reportText) {
+      const waBtn = document.getElementById('btn-whatsapp');
+      const emailBtn = document.getElementById('btn-email');
+      const copyBtn = document.getElementById('btn-copy');
+      
+      const encodedText = encodeURIComponent(reportText);
+      waBtn.onclick = function() {
+        window.open(`https://wa.me/${MENTOR_WHATSAPP}?text=${encodedText}`, '_blank');
+      };
+      
+      const subject = encodeURIComponent("Aplicação da HASH + NDI - Relatório");
+      emailBtn.onclick = function() {
+        window.location.href = `mailto:${MENTOR_EMAIL}?subject=${subject}&body=${encodedText}`;
+      };
+      
+      copyBtn.onclick = function() {
+        navigator.clipboard.writeText(reportText).then(() => {
+          const originalText = copyBtn.textContent;
+          copyBtn.textContent = "[ COPIADO COM SUCESSO! ]";
+          copyBtn.classList.remove('text-hacker-yellow', 'border-hacker-yellow');
+          copyBtn.classList.add('text-hacker-green', 'border-hacker-green');
+          setTimeout(() => {
+            copyBtn.textContent = originalText;
+            copyBtn.classList.remove('text-hacker-green', 'border-hacker-green');
+            copyBtn.classList.add('text-hacker-yellow', 'border-hacker-yellow');
+          }, 2000);
+        }).catch(err => {
+          alert('Erro ao copiar relatório. Por favor copie diretamente da caixa de texto.');
+        });
+      };
+    }
+
+    // ===================== CHECKOUT GATEWAY LOGIC =====================
+    let checkoutOpen = false;
+    let checkoutMinimized = false;
+    let checkoutMaximized = false;
+    let checkoutPosition = { x: 120, y: 80 };
+    let isCheckoutDragging = false;
+    const checkoutDragRef = { startX: 0, startY: 0, posX: 120, posY: 80 };
+    let checkoutPaymentMethod = 'pix';
+    let checkoutStatus = 'idle'; // 'idle' | 'processing' | 'success'
+    let pixTimeLeft = 600;
+    let pixCountdownTimer = null;
+    let pixAutoApproveTimer = null;
+
+    const checkoutDragWrapper = document.getElementById('checkout-window-drag-wrapper');
+    const checkoutHeader = document.getElementById('checkout-header');
+    const checkoutBody = document.getElementById('checkout-body');
+    const btnCheckoutClose = document.getElementById('btn-checkout-close');
+    const btnCheckoutMinimize = document.getElementById('btn-checkout-minimize');
+    const btnCheckoutMaximize = document.getElementById('btn-checkout-maximize');
+    const taskbarCheckoutTab = document.getElementById('taskbar-checkout-tab');
+
+    function openCheckoutWindow() {
+      checkoutOpen = true;
+      checkoutMinimized = false;
+      checkoutStatus = 'idle';
+      checkoutPaymentMethod = 'pix';
+      pixTimeLeft = 600;
+      checkoutDragWrapper.classList.remove('hidden');
+      taskbarCheckoutTab.classList.remove('hidden');
+      renderCheckoutBody();
+      startPixCountdown();
+    }
+
+    function closeCheckoutWindow() {
+      checkoutOpen = false;
+      checkoutDragWrapper.classList.add('hidden');
+      taskbarCheckoutTab.classList.add('hidden');
+      clearInterval(pixCountdownTimer);
+      clearTimeout(pixAutoApproveTimer);
+    }
+
+    btnCheckoutClose.onclick = closeCheckoutWindow;
+    btnCheckoutMinimize.onclick = function() {
+      checkoutMinimized = !checkoutMinimized;
+      checkoutDragWrapper.style.display = checkoutMinimized ? 'none' : 'flex';
+    };
+    btnCheckoutMaximize.onclick = function() {
+      checkoutMaximized = !checkoutMaximized;
+      if (checkoutMaximized) {
+        checkoutDragWrapper.className = 'fixed inset-0 z-40 flex flex-col w-screen h-screen';
+        checkoutDragWrapper.style.transform = '';
+        checkoutDragWrapper.style.left = '';
+        checkoutDragWrapper.style.top = '';
+        document.getElementById('checkout-window').classList.remove('rounded-2xl');
+        document.getElementById('checkout-window').classList.add('rounded-none');
+      } else {
+        checkoutDragWrapper.className = 'absolute z-30 flex flex-col w-full max-w-md transition-all duration-75';
+        checkoutDragWrapper.style.left = '50%';
+        checkoutDragWrapper.style.top = '50%';
+        checkoutDragWrapper.style.transform = `translate(calc(-50% + ${checkoutPosition.x}px), calc(-50% + ${checkoutPosition.y}px))`;
+        document.getElementById('checkout-window').classList.add('rounded-2xl');
+        document.getElementById('checkout-window').classList.remove('rounded-none');
+      }
+    };
+    taskbarCheckoutTab.onclick = function() {
+      checkoutMinimized = !checkoutMinimized;
+      checkoutDragWrapper.style.display = checkoutMinimized ? 'none' : 'flex';
+    };
+
+    // Checkout drag
+    checkoutHeader.addEventListener('mousedown', function(e) {
+      if (e.button !== 0 || checkoutMaximized) return;
+      isCheckoutDragging = true;
+      checkoutDragRef.startX = e.clientX;
+      checkoutDragRef.startY = e.clientY;
+      checkoutDragRef.posX = checkoutPosition.x;
+      checkoutDragRef.posY = checkoutPosition.y;
+      e.preventDefault();
+    });
+    checkoutHeader.addEventListener('touchstart', function(e) {
+      if (e.touches.length !== 1 || checkoutMaximized) return;
+      isCheckoutDragging = true;
+      checkoutDragRef.startX = e.touches[0].clientX;
+      checkoutDragRef.startY = e.touches[0].clientY;
+      checkoutDragRef.posX = checkoutPosition.x;
+      checkoutDragRef.posY = checkoutPosition.y;
+    }, { passive: true });
+    window.addEventListener('mousemove', function(e) {
+      if (!isCheckoutDragging) return;
+      checkoutPosition.x = checkoutDragRef.posX + (e.clientX - checkoutDragRef.startX);
+      checkoutPosition.y = checkoutDragRef.posY + (e.clientY - checkoutDragRef.startY);
+      checkoutDragWrapper.style.transform = `translate(calc(-50% + ${checkoutPosition.x}px), calc(-50% + ${checkoutPosition.y}px))`;
+    });
+    window.addEventListener('touchmove', function(e) {
+      if (!isCheckoutDragging || e.touches.length !== 1) return;
+      checkoutPosition.x = checkoutDragRef.posX + (e.touches[0].clientX - checkoutDragRef.startX);
+      checkoutPosition.y = checkoutDragRef.posY + (e.touches[0].clientY - checkoutDragRef.startY);
+      checkoutDragWrapper.style.transform = `translate(calc(-50% + ${checkoutPosition.x}px), calc(-50% + ${checkoutPosition.y}px))`;
+    }, { passive: true });
+    window.addEventListener('mouseup', function() { isCheckoutDragging = false; });
+    window.addEventListener('touchend', function() { isCheckoutDragging = false; });
+
+    function startPixCountdown() {
+      clearInterval(pixCountdownTimer);
+      clearTimeout(pixAutoApproveTimer);
+      pixTimeLeft = 600;
+      pixCountdownTimer = setInterval(function() {
+        pixTimeLeft--;
+        if (pixTimeLeft <= 0) { clearInterval(pixCountdownTimer); pixTimeLeft = 0; }
+        renderCheckoutBody();
+      }, 1000);
+      pixAutoApproveTimer = setTimeout(function() {
+        if (checkoutOpen && checkoutPaymentMethod === 'pix' && checkoutStatus === 'idle') {
+          checkoutStatus = 'processing';
+          renderCheckoutBody();
+          setTimeout(function() { checkoutStatus = 'success'; renderCheckoutBody(); }, 2000);
+        }
+      }, 15000);
+    }
+
+    function renderCheckoutBody() {
+      const userName = userAnswers[4] || '';
+      
+      if (checkoutStatus === 'success') {
+        checkoutBody.innerHTML = `
+          <div class="flex flex-col items-center justify-center text-center space-y-5 py-8">
+            <div class="relative w-20 h-20">
+              <div class="absolute inset-0 rounded-full bg-hacker-green/20 animate-ping"></div>
+              <div class="relative w-20 h-20 rounded-full bg-hacker-green/10 border-2 border-hacker-green flex items-center justify-center text-3xl">✓</div>
+            </div>
+            <div>
+              <div class="text-hacker-green font-bold text-sm uppercase tracking-widest">PAGAMENTO CONFIRMADO</div>
+              <div class="text-hacker-gray text-[10px] mt-1">Transação processada com sucesso via Stripe API</div>
+            </div>
+            <div class="bg-[#0c101a] border border-hacker-green/20 rounded-xl p-4 space-y-2 w-full max-w-xs">
+              <div class="text-hacker-text font-bold">Parabéns${userName ? ', ' + userName : ''}! 🎉</div>
+              <div class="text-hacker-gray text-[10px] leading-relaxed">
+                Seu acesso à <strong class="text-hacker-green">Comunidade NDI</strong> e à plataforma <strong class="text-hacker-green">HASH_NDI</strong> foi liberado. Verifique seu e-mail para as credenciais de acesso.
+              </div>
+              <div class="border-t border-hacker-gray/20 pt-2 mt-2 flex items-baseline justify-between">
+                <span class="text-hacker-gray">Valor pago:</span>
+                <span class="text-hacker-green font-bold">R$ 29,90</span>
+              </div>
+            </div>
+            <div class="flex flex-col gap-2 w-full max-w-xs">
+              <button onclick="window.open('https://comunidade.ndi.com.br','_blank')" class="w-full py-2.5 bg-hacker-green text-hacker-black font-bold uppercase text-xs tracking-wider rounded-lg hover:brightness-110 transition-all cursor-pointer">Acessar Comunidade NDI</button>
+              <button onclick="window.open('https://hash.ndi.com.br','_blank')" class="w-full py-2.5 bg-transparent border border-hacker-blue text-hacker-blue font-bold uppercase text-xs tracking-wider rounded-lg hover:bg-hacker-blue hover:text-hacker-black transition-all cursor-pointer">Acessar Repositório HASH_NDI</button>
+            </div>
+          </div>`;
+        return;
+      }
+
+      if (checkoutStatus === 'processing') {
+        checkoutBody.innerHTML = `
+          <div class="flex flex-col items-center justify-center text-center space-y-5 py-12">
+            <div class="relative w-16 h-16">
+              <div class="absolute inset-0 rounded-full border-4 border-hacker-green/20"></div>
+              <div class="absolute inset-0 rounded-full border-4 border-t-hacker-green border-r-hacker-green animate-spin"></div>
+            </div>
+            <div class="space-y-1">
+              <div class="text-hacker-green font-bold uppercase tracking-widest animate-pulse">Processando pagamento...</div>
+              <div class="text-hacker-gray text-[10px]">Conectando ao Stripe Secure Gateway via HTTPS</div>
+            </div>
+            <div class="text-[10px] text-hacker-gray font-mono space-y-1 text-left w-full max-w-xs">
+              <div class="text-hacker-blue">$ curl -X POST https://api.stripe.com/v1/charges</div>
+              <div class="text-hacker-yellow animate-pulse">⏳ Awaiting response...</div>
+            </div>
+          </div>`;
+        return;
+      }
+
+      // Idle state
+      const pixCode = '00020126580014BR.GOV.BCB.PIX0136hashndi-' + Date.now().toString(36).toUpperCase() + '520400005303986540529.905802BR5925HASH NDI COMUNIDADE LTDA6009SAO PAULO';
+      const mins = String(Math.floor(pixTimeLeft / 60)).padStart(2, '0');
+      const secs = String(pixTimeLeft % 60).padStart(2, '0');
+
+      let pixTabClass = checkoutPaymentMethod === 'pix' ? 'bg-hacker-green/15 text-hacker-green border-hacker-green/40 shadow-[0_0_8px_rgba(43,216,122,0.15)]' : 'bg-transparent text-hacker-gray border-hacker-gray/20 hover:border-hacker-gray/40';
+      let cardTabClass = checkoutPaymentMethod === 'card' ? 'bg-hacker-blue/15 text-hacker-blue border-hacker-blue/40 shadow-[0_0_8px_rgba(87,165,229,0.15)]' : 'bg-transparent text-hacker-gray border-hacker-gray/20 hover:border-hacker-gray/40';
+
+      let paymentContent = '';
+      if (checkoutPaymentMethod === 'pix') {
+        paymentContent = `
+          <div class="space-y-4">
+            <div class="flex flex-col items-center py-4">
+              <div class="w-36 h-36 bg-white rounded-xl p-2 shadow-[0_0_20px_rgba(43,216,122,0.2)]">
+                <div class="w-full h-full rounded-lg" style="background:repeating-conic-gradient(#111 0% 25%,#fff 0% 50%) 0 0/12px 12px,repeating-conic-gradient(#111 0% 25%,#fff 0% 50%) 6px 6px/12px 12px;background-size:12px 12px;"></div>
+              </div>
+              <div class="text-[9px] text-hacker-gray mt-2">Escaneie o QR Code com seu aplicativo bancário</div>
+            </div>
+            <div class="bg-[#0c101a] border border-hacker-gray/20 rounded-lg p-3 space-y-2">
+              <div class="text-[10px] text-hacker-gray uppercase tracking-wider font-bold">Código PIX Copia e Cola</div>
+              <div class="bg-[#070b13] border border-hacker-gray/10 rounded p-2 text-[10px] text-hacker-text break-all font-mono select-all" id="pix-code-text">${pixCode}</div>
+              <button onclick="navigator.clipboard.writeText(document.getElementById('pix-code-text').textContent).catch(function(){})" class="w-full py-2 bg-hacker-green/10 border border-hacker-green/30 text-hacker-green font-bold uppercase text-[10px] tracking-wider rounded-lg hover:bg-hacker-green/20 transition-all cursor-pointer">📋 Copiar Código PIX</button>
+            </div>
+            <div class="text-center space-y-1">
+              <div class="text-[10px] text-hacker-yellow animate-pulse font-bold">⏳ Aguardando pagamento PIX...</div>
+              <div class="text-[10px] text-hacker-gray">Expira em: ${mins}:${secs}</div>
+            </div>
+            <button onclick="confirmPixPayment()" class="w-full py-2.5 bg-hacker-green text-hacker-black font-bold uppercase text-xs tracking-wider rounded-lg hover:brightness-110 transition-all cursor-pointer shadow-[0_0_10px_rgba(43,216,122,0.2)]">✓ Já fiz o pagamento PIX</button>
+          </div>`;
+      } else {
+        paymentContent = `
+          <div class="space-y-3">
+            <div>
+              <label class="text-[10px] text-hacker-gray uppercase tracking-wider font-bold block mb-1">Nome no Cartão</label>
+              <input type="text" id="cc-name" placeholder="Nome como está no cartão" class="w-full bg-[#0c101a] border border-hacker-gray/20 rounded-lg px-3 py-2 text-hacker-text text-xs focus:outline-none focus:border-hacker-blue/60 placeholder:text-hacker-gray/40" />
+            </div>
+            <div>
+              <label class="text-[10px] text-hacker-gray uppercase tracking-wider font-bold block mb-1">Número do Cartão</label>
+              <input type="text" id="cc-number" placeholder="0000 0000 0000 0000" maxlength="16" class="w-full bg-[#0c101a] border border-hacker-gray/20 rounded-lg px-3 py-2 text-hacker-text text-xs focus:outline-none focus:border-hacker-blue/60 placeholder:text-hacker-gray/40 tracking-widest" oninput="this.value=this.value.replace(/\\D/g,'').slice(0,16)" />
+            </div>
+            <div class="flex gap-3">
+              <div class="flex-1">
+                <label class="text-[10px] text-hacker-gray uppercase tracking-wider font-bold block mb-1">Validade</label>
+                <input type="text" id="cc-expiry" placeholder="MM/AA" maxlength="5" class="w-full bg-[#0c101a] border border-hacker-gray/20 rounded-lg px-3 py-2 text-hacker-text text-xs focus:outline-none focus:border-hacker-blue/60 placeholder:text-hacker-gray/40" oninput="var v=this.value.replace(/\\D/g,'').slice(0,4);if(v.length>=3)v=v.slice(0,2)+'/'+v.slice(2);this.value=v;" />
+              </div>
+              <div class="flex-1">
+                <label class="text-[10px] text-hacker-gray uppercase tracking-wider font-bold block mb-1">CVV</label>
+                <input type="text" id="cc-cvv" placeholder="123" maxlength="4" class="w-full bg-[#0c101a] border border-hacker-gray/20 rounded-lg px-3 py-2 text-hacker-text text-xs focus:outline-none focus:border-hacker-blue/60 placeholder:text-hacker-gray/40" oninput="this.value=this.value.replace(/\\D/g,'').slice(0,4)" />
+              </div>
+            </div>
+            <button onclick="submitCardPayment()" class="w-full py-2.5 bg-hacker-blue text-hacker-black font-bold uppercase text-xs tracking-wider rounded-lg hover:brightness-110 transition-all cursor-pointer shadow-[0_0_10px_rgba(87,165,229,0.2)] mt-2">💳 Pagar R$ 29,90</button>
+            <div class="text-[9px] text-hacker-gray text-center">🔒 Transação protegida por criptografia SSL 256-bit</div>
+          </div>`;
+      }
+
+      checkoutBody.innerHTML = `
+        <div class="bg-[#0c101a] border border-hacker-gray/20 rounded-xl p-4 space-y-2">
+          <div class="text-[10px] text-hacker-gray uppercase tracking-widest font-bold">Resumo do Pedido</div>
+          <div class="flex justify-between items-center">
+            <span class="text-hacker-text">Comunidade NDI + HASH_NDI</span>
+            <span class="text-hacker-green font-bold">R$ 29,90</span>
+          </div>
+          <div class="border-t border-hacker-gray/10 pt-2 flex justify-between items-center">
+            <span class="text-hacker-gray">Total</span>
+            <span class="text-hacker-green font-extrabold text-base">R$ 29,90</span>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="switchPaymentMethod('pix')" class="flex-1 py-2 rounded-lg font-bold uppercase text-[10px] tracking-wider transition-all cursor-pointer border ${pixTabClass}">⚡ PIX</button>
+          <button onclick="switchPaymentMethod('card')" class="flex-1 py-2 rounded-lg font-bold uppercase text-[10px] tracking-wider transition-all cursor-pointer border ${cardTabClass}">💳 Cartão</button>
+        </div>
+        ${paymentContent}`;
+    }
+
+    function switchPaymentMethod(method) {
+      checkoutPaymentMethod = method;
+      if (method === 'pix') { startPixCountdown(); }
+      else { clearInterval(pixCountdownTimer); clearTimeout(pixAutoApproveTimer); }
+      renderCheckoutBody();
+    }
+
+    function confirmPixPayment() {
+      checkoutStatus = 'processing';
+      clearInterval(pixCountdownTimer);
+      clearTimeout(pixAutoApproveTimer);
+      renderCheckoutBody();
+      setTimeout(function() { checkoutStatus = 'success'; renderCheckoutBody(); }, 2500);
+    }
+
+    function submitCardPayment() {
+      const name = document.getElementById('cc-name')?.value || '';
+      const number = document.getElementById('cc-number')?.value || '';
+      const expiry = document.getElementById('cc-expiry')?.value || '';
+      const cvv = document.getElementById('cc-cvv')?.value || '';
+      let hasError = false;
+      if (!name.trim()) { alert('Nome no cartão é obrigatório'); hasError = true; }
+      if (number.length < 13) { alert('Número do cartão inválido (mín. 13 dígitos)'); hasError = true; }
+      if (expiry.length < 5) { alert('Validade inválida (MM/AA)'); hasError = true; }
+      if (cvv.length < 3) { alert('CVV inválido'); hasError = true; }
+      if (hasError) return;
+      checkoutStatus = 'processing';
+      renderCheckoutBody();
+      setTimeout(function() { checkoutStatus = 'success'; renderCheckoutBody(); }, 3000);
+    }
+  </script>
+</body>
+</html>
